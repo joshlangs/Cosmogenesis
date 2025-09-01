@@ -41,7 +41,7 @@ public class DbDocConverterBaseTests: DbDocConverterBase
         Assert.Same(Options, JsonSerializerOptions);
     }
 
-    string? Type;
+    new string? Type;
     JsonSerializerOptions? Options;
     protected override DbDoc DeserializeByType(ReadOnlySpan<byte> data, string? type, JsonSerializerOptions options)
     {

@@ -54,6 +54,7 @@ public class DbBatchBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
     public void ExecuteAsync_Empty_ReturnsCompletedSynchronously()
     {
         var batch = CreateTestBatch();
@@ -97,6 +98,7 @@ public class DbBatchBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
     public void ExecuteWithResultsAsync_Empty_ReturnsCompletedSynchronously()
     {
         var batch = CreateTestBatch();
@@ -105,7 +107,7 @@ public class DbBatchBaseTests
 
         Assert.True(result.IsCompletedSuccessfully);
         Assert.Null(result.Result.Conflict);
-        Assert.Empty(result.Result.Documents);
+        Assert.Empty(result.Result.Documents!);
     }
 
     [Fact]
@@ -367,7 +369,7 @@ public class DbBatchBaseTests
 
         var batch = CreateTestBatch();
         batch.CreateCore(TestDocWithoutETag, TestDocWithoutETag.Type);
-        Assert.Equal(TestDocWithoutETag.pk, PartitionKeyString);
+        Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
         MockSerializer.Verify();
         MockBatch.Verify();
     }
@@ -471,7 +473,7 @@ public class DbBatchBaseTests
 
         var batch = CreateTestBatch();
         batch.CreateOrReplaceCore(TestDocWithoutETag, TestDocWithoutETag.Type);
-        Assert.Equal(TestDocWithoutETag.pk, PartitionKeyString);
+        Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
         MockSerializer.Verify();
         MockBatch.Verify();
     }

@@ -378,6 +378,7 @@ public class DbBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
     public void ReadByIdsAsync_NoIds_ReturnsEmptySynchronously()
     {
         var result = CreateDb().ReadByIdsAsync<TestDoc>(Array.Empty<string>(), PartitionKey, Type);
@@ -530,7 +531,7 @@ public class DbBaseTests
 
         await CreateDb().CreateItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString);
 
-        Assert.Equal(TestDocWithoutETag.pk, PartitionKeyString);
+        Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
     }
 
     [Fact]
@@ -551,7 +552,7 @@ public class DbBaseTests
 
         await CreateDb().CreateItemAsync(doc, Type, PartitionKey, PartitionKeyString);
 
-        Assert.Equal(doc.Type, Type);
+        Assert.Equal(Type, doc.Type);
     }
 
     [Fact]
@@ -605,7 +606,7 @@ public class DbBaseTests
 
         await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString);
 
-        Assert.Equal(TestDocWithoutETag.pk, PartitionKeyString);
+        Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
     }
 
     [Fact]
@@ -627,7 +628,7 @@ public class DbBaseTests
 
         await CreateDb().CreateOrReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString);
 
-        Assert.Equal(doc.Type, Type);
+        Assert.Equal(Type, doc.Type);
     }
 
     [Fact]
@@ -676,7 +677,7 @@ public class DbBaseTests
 
         await mockDb.Object.ReadOrCreateItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false);
 
-        Assert.Equal(TestDocWithoutETag.pk, PartitionKeyString);
+        Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
     }
 
     [Fact]
@@ -695,7 +696,7 @@ public class DbBaseTests
 
         await mockDb.Object.ReadOrCreateItemAsync(doc, Type, PartitionKey, PartitionKeyString, false);
 
-        Assert.Equal(doc.Type, Type);
+        Assert.Equal(Type, doc.Type);
     }
 
     [Fact]

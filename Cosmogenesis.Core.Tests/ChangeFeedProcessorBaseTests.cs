@@ -74,7 +74,7 @@ public class ChangeFeedProcessorBaseTests
     public void StartAsync_CallsStartAsync()
     {
         MockProcessor.Setup(x => x.StartAsync()).Returns(Task.CompletedTask).Verifiable();
-        var feed = new Mock<TestChangeFeed>(MockBehavior.Strict, MockSerializer.Object, MockDatabaseContainer.Object, MockLeaseContainer.Object, "asdf", 5, null, null, new BatchProcessor(new FeedHandlers(Cancel, Cancel)));
+        var feed = new Mock<TestChangeFeed>(MockBehavior.Strict, MockSerializer.Object, MockDatabaseContainer.Object, MockLeaseContainer.Object, "asdf", 5, null!, null!, new BatchProcessor(new FeedHandlers(Cancel, Cancel)));
         feed.Setup(x => x.MockCreateChangeFeedProcessor()).Returns(MockProcessor.Object).Verifiable();
         feed.Setup(x => x.StartAsync()).CallBase();
 
@@ -88,7 +88,7 @@ public class ChangeFeedProcessorBaseTests
     public void StopAsync_CallsStopAsync()
     {
         MockProcessor.Setup(x => x.StopAsync()).Returns(Task.CompletedTask).Verifiable();
-        var feed = new Mock<TestChangeFeed>(MockBehavior.Strict, MockSerializer.Object, MockDatabaseContainer.Object, MockLeaseContainer.Object, "asdf", 5, null, null, new BatchProcessor(new FeedHandlers(Cancel, Cancel)));
+        var feed = new Mock<TestChangeFeed>(MockBehavior.Strict, MockSerializer.Object, MockDatabaseContainer.Object, MockLeaseContainer.Object, "asdf", 5, null!, null!, new BatchProcessor(new FeedHandlers(Cancel, Cancel)));
         feed.Setup(x => x.MockCreateChangeFeedProcessor()).Returns(MockProcessor.Object).Verifiable();
         feed.Setup(x => x.StopAsync()).CallBase();
 
