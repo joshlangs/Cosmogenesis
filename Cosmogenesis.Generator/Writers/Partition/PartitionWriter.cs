@@ -165,7 +165,8 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.ReplaceResult<{documentPlan.FullTypeName}>> ReplaceAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument}) =>
         this.ReplaceItemAsync(
             item: {documentPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({documentPlan.ClassNameArgument})), 
-            type: {documentPlan.ConstDocType});
+            type: {documentPlan.ConstDocType},
+            allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
 ";
 
     static string DeleteIfTransient(DocumentPlan documentPlan) =>
@@ -211,7 +212,7 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     internal protected virtual System.Threading.Tasks.Task<Cosmogenesis.Core.CreateOrReplaceResult<{documentPlan.FullTypeName}>> CreateOrReplaceAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
     {{
         {DocumentModelWriter.CreateAndCheckPkAndId(partitionPlan, documentPlan, documentPlan.ClassNameArgument)}
-        return this.CreateOrReplaceItemAsync(item: {documentPlan.ClassNameArgument}, type: {documentPlan.ConstDocType});
+        return this.CreateOrReplaceItemAsync(item: {documentPlan.ClassNameArgument}, type: {documentPlan.ConstDocType}, allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
     }}
 ";
 

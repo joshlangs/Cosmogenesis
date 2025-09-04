@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Cosmogenesis.Core.Tests;
 
-public class DbDocConverterBaseTests: DbDocConverterBase
+public class DbDocConverterBaseTests : DbDocConverterBase
 {
     readonly JsonSerializerOptions JsonSerializerOptions = new();
 
@@ -26,14 +26,14 @@ public class DbDocConverterBaseTests: DbDocConverterBase
         {
         }
     }
-    
+
     [Fact]
     [Trait("Type", "Unit")]
     public void Read_WithType_CallsDeserializeByType()
     {
         var json = @"{""Type"" : ""test""}";
         var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json));
-        
+
         var result = Read(ref reader, typeof(object), JsonSerializerOptions);
 
         Assert.Same(TestDoc.Instance, result);

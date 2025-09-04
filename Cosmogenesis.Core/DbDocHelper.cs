@@ -4,7 +4,7 @@ public static class DbDocHelper
 {
     public const int MaxIdBytes = 1024;
     public const char InvalidCharReplacement = '_';
-    static readonly char[] InvalidIdChars = new[] { '/', '\\', '?', '#' };
+    static readonly char[] InvalidIdChars = ['/', '\\', '?', '#'];
 
     public static string GetValidId(string id)
     {

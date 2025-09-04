@@ -9,8 +9,17 @@ static class PlanExtensions
     public static string AsInputParameters(this GetPkIdPlan plan) =>
         plan.Arguments.Select(x => $"{x.FullTypeName} {x.ArgumentName}").JoinNonEmpty();
 
-    public static string AsInputParameters(this IEnumerable<PropertyPlan> properties) =>
-        properties.OrderBy(x => x.UseDefault).Select(x => $"{x.FullTypeName} {x.ArgumentName}{(x.UseDefault ? " = default" : "")}").JoinNonEmpty();
+    public static string AsInputParameters(this IEnumerable<PropertyPlan> properties, DocumentPlan documentPlan)
+    {
+        var args = properties
+            .OrderBy(x => x.UseDefault)
+            .Select(x => $"{x.FullTypeName} {x.ArgumentName}{(x.UseDefault ? " = default" : "")}");
+        if (documentPlan.AutoExpires)
+        {
+            args = args.Concat([$"int? ttl = {(documentPlan.DefaultTtl.HasValue ? documentPlan.DefaultTtl.Value.ToString() : "default")}"]);
+        }
+        return args.JoinNonEmpty();
+    }
 
     public static string AsInputParameterMapping(this IEnumerable<PropertyPlan> properties) =>
         properties.Select(x => $"{x.ArgumentName}: {x.ArgumentName}").JoinNonEmpty();
@@ -34,6 +43,10 @@ static class PlanExtensions
             .Values
             .Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName))
             .Select(x => $"{x.PropertyName} = {x.ArgumentName}");
+        if (documentPlan.AutoExpires)
+        {
+            setters = setters.Concat([$"ttl = ttl"]);
+        }
         var key = partitionPlan
             .GetPkPlan
             .Arguments

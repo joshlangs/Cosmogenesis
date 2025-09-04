@@ -34,7 +34,7 @@ public class {partitionPlan.ReadOrCreateClassName}
     /// </summary>
     /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
     /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
-    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.ReadOrCreateResult<{documentPlan.FullTypeName}>> {documentPlan.ClassName}Async({new[] { "bool tryCreateFirst", documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters() }.JoinNonEmpty()}) => 
+    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.ReadOrCreateResult<{documentPlan.FullTypeName}>> {documentPlan.ClassName}Async({new[] { "bool tryCreateFirst", documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters(documentPlan) }.JoinNonEmpty()}) => 
         this.{partitionPlan.ClassName}.ReadOrCreateAsync({documentPlan.ClassNameArgument}: new {documentPlan.FullTypeName} {{ {partitionPlan.AsSettersFromDocumentPlanAndPartitionClass(documentPlan)} }}, tryCreateFirst: tryCreateFirst);
 ";
 }

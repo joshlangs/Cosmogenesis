@@ -13,14 +13,14 @@ public class DbPartitionBaseTests
         public new TransactionalBatch CreateBatchForPartition() => base.CreateBatchForPartition();
         public new Task<CreateResult<T>> CreateItemAsync<T>(T item, string type) where T : DbDoc => base.CreateItemAsync(item, type);
         public new Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, bool tryCreateFirst) where T : DbDoc => base.ReadOrCreateItemAsync(item, type, tryCreateFirst);
-        public new Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type) where T : DbDoc => base.CreateOrReplaceItemAsync(item, type);
-        public new Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type) where T : DbDoc => base.ReplaceItemAsync(item, type);
+        public new Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, bool allowTtl) where T : DbDoc => base.CreateOrReplaceItemAsync(item, type, allowTtl);
+        public new Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, bool allowTtl) where T : DbDoc => base.ReplaceItemAsync(item, type, allowTtl);
         public new Task<DbConflictType?> DeleteItemAsync<T>(T item) where T : DbDoc => base.DeleteItemAsync(item);
     }
 
     readonly Mock<DbBase> MockDb = new(MockBehavior.Strict);
     readonly Mock<DbSerializerBase> MockSerializer = new(MockBehavior.Strict);
-    readonly Mock<TransactionalBatch> MockBatch =  new(MockBehavior.Strict);
+    readonly Mock<TransactionalBatch> MockBatch = new(MockBehavior.Strict);
     const string PartitionKeyString = "testpk";
     readonly PartitionKey PartitionKey = new(PartitionKeyString);
     const string Type = "testtype";
@@ -100,10 +100,10 @@ public class DbPartitionBaseTests
     public async Task CreateOrReplaceItemAsync_CallsDB()
     {
         var actualResult = DbModelFactory.CreateCreateOrReplaceResult(TestDoc.Instance, true);
-        MockDb.Setup(x => x.CreateOrReplaceItemAsync(TestDoc.Instance, Type, PartitionKey, PartitionKeyString)).Returns(Task.FromResult(actualResult)).Verifiable();
+        MockDb.Setup(x => x.CreateOrReplaceItemAsync(TestDoc.Instance, Type, PartitionKey, PartitionKeyString, true)).Returns(Task.FromResult(actualResult)).Verifiable();
         var partition = new DbPartitionBaseTests.TestPartition(MockDb.Object, PartitionKeyString, MockSerializer.Object);
 
-        var result = await partition.CreateOrReplaceItemAsync(TestDoc.Instance, Type);
+        var result = await partition.CreateOrReplaceItemAsync(TestDoc.Instance, Type, true);
 
         MockDb.Verify();
         Assert.Same(result, actualResult);
@@ -114,10 +114,10 @@ public class DbPartitionBaseTests
     public async Task ReplaceItemAsync_CallsDB()
     {
         var actualResult = DbModelFactory.CreateReplaceResult(TestDoc.Instance);
-        MockDb.Setup(x => x.ReplaceItemAsync(TestDoc.Instance, Type, PartitionKey, PartitionKeyString)).Returns(Task.FromResult(actualResult)).Verifiable();
+        MockDb.Setup(x => x.ReplaceItemAsync(TestDoc.Instance, Type, PartitionKey, PartitionKeyString, true)).Returns(Task.FromResult(actualResult)).Verifiable();
         var partition = new DbPartitionBaseTests.TestPartition(MockDb.Object, PartitionKeyString, MockSerializer.Object);
 
-        var result = await partition.ReplaceItemAsync(TestDoc.Instance, Type);
+        var result = await partition.ReplaceItemAsync(TestDoc.Instance, Type, true);
 
         MockDb.Verify();
         Assert.Same(result, actualResult);

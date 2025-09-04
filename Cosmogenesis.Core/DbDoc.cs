@@ -1,4 +1,6 @@
-﻿namespace Cosmogenesis.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cosmogenesis.Core;
 
 public abstract class DbDoc
 {
@@ -33,6 +35,12 @@ public abstract class DbDoc
     /// System property - do not set manually.
     /// </summary>
     public int _ts { get; init; }
+    /// <summary>
+    /// The time (in seconds) until a document can be automatically deleted, if the container has enabled auto-expiry.
+    /// System property - do not set manually.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int? ttl { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
 
     string type = default!;

@@ -79,7 +79,7 @@ public class DbQueryBuilderBaseTests
             })
             .Verifiable();
 
-        var result = new TestQueryBuilder(MockDb.Object, null).BuildQueryByTypes<TestDoc>(new[] { "asdf", "asdf2" }).ToList();
+        var result = new TestQueryBuilder(MockDb.Object, null).BuildQueryByTypes<TestDoc>(["asdf", "asdf2"]).ToList();
 
         Assert.Single(result);
         Assert.Same(result[0], items[1]);
@@ -135,7 +135,7 @@ public class DbQueryBuilderBaseTests
             })
             .Verifiable();
 
-        var result = new TestQueryBuilder(MockDb.Object, pk).BuildQueryByTypes<TestDoc>(new[] { "asdf", "asdf2" }).ToList();
+        var result = new TestQueryBuilder(MockDb.Object, pk).BuildQueryByTypes<TestDoc>(["asdf", "asdf2"]).ToList();
 
         Assert.Single(result);
         Assert.Same(result[0], items[1]);

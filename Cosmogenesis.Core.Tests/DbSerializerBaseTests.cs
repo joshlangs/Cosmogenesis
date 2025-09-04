@@ -41,6 +41,10 @@ public class DbSerializerBaseTests
 
         [Fact]
         [Trait("Type", "Unit")]
+        public void ToStream_Doc_HasNoTtl() => Assert.DoesNotContain("ttl", Encoding.UTF8.GetString(((MemoryStream)ToStream(TestDoc.Instance)).ToSpan()));
+
+        [Fact]
+        [Trait("Type", "Unit")]
         public void ToFromStream_Roundtrip_4() => Assert.Equal(4, FromStream<int>(ToStream(4)));
 
         [Fact]

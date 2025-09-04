@@ -45,19 +45,21 @@ public abstract class DbPartitionBase
             partitionKeyString: PartitionKeyString,
             tryCreateFirst: tryCreateFirst);
 
-    protected Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type) where T : DbDoc =>
+    protected Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, bool allowTtl) where T : DbDoc =>
         DB.CreateOrReplaceItemAsync(
             item: item,
             type: type,
             partitionKey: PartitionKey,
-            partitionKeyString: PartitionKeyString);
+            partitionKeyString: PartitionKeyString,
+            allowTtl: allowTtl);
 
-    protected Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type) where T : DbDoc =>
+    protected Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, bool allowTtl) where T : DbDoc =>
         DB.ReplaceItemAsync(
             item: item,
             type: type,
             partitionKey: PartitionKey,
-            partitionKeyString: PartitionKeyString);
+            partitionKeyString: PartitionKeyString,
+            allowTtl: allowTtl);
 
     protected Task<DbConflictType?> DeleteItemAsync<T>(T item) where T : DbDoc =>
         DB.DeleteItemAsync(

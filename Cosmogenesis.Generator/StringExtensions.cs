@@ -18,7 +18,7 @@ static class StringExtensions
         char.IsUpper(name[0]) ? char.ToLower(name[0]) + name.Substring(1) :
         '_' + name;
 
-    static readonly string[] PluralEndings = new[] { "s", "sh", "ch", "x", "z" };
+    static readonly string[] PluralEndings = ["s", "sh", "ch", "x", "z"];
     public static string Pluralize(this string singular) =>
         PluralEndings.Any(singular.EndsWith) ? $"{singular}es" :
         singular.EndsWith("y") && !singular.EndsWith("ay") && !singular.EndsWith("ey") && !singular.EndsWith("iy") && !singular.EndsWith("oy") && !singular.EndsWith("uy") ? singular.Substring(0, singular.Length - 1) + "ies" :

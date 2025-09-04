@@ -63,8 +63,8 @@ public class ChangeFeedProcessorBaseTests
     {
         public FeedHandlers(Func<CancellationToken, Task> handleNew, Func<CancellationToken, Task> handleFinish)
         {
-            this.FinishingBatch = handleFinish;
-            this.NewChangeFeedBatch = handleNew;
+            FinishingBatch = handleFinish;
+            NewChangeFeedBatch = handleNew;
         }
         public override Task? GetHandlerTask(DbDoc change, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }

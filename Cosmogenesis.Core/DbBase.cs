@@ -274,7 +274,7 @@ public abstract class DbBase
         return result.CreateResultFromErrorStatus<T>();
     }
 
-    internal protected virtual async Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
+    internal protected virtual async Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
         if (item is null)
         {
@@ -314,6 +314,10 @@ public abstract class DbBase
         else if (item.Type != type)
         {
             throw new InvalidOperationException($"The document .Type property does not match what was expected ({type})");
+        }
+        if (item.ttl.HasValue && !allowTtl)
+        {
+            throw new InvalidOperationException($"The document .ttl property must be null");
         }
 
         Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
@@ -438,7 +442,7 @@ public abstract class DbBase
         throw new DbOverloadedException(); // Should never get here
     }
 
-    internal protected virtual async Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
+    internal protected virtual async Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
         if (item is null)
         {
@@ -470,6 +474,10 @@ public abstract class DbBase
         if (item.Type != type)
         {
             throw new InvalidOperationException($"The document .Type property does not match what was expected ({type})");
+        }
+        if (item.ttl.HasValue && !allowTtl)
+        {
+            throw new InvalidOperationException($"The document .ttl property must be null");
         }
 
         if (ValidateStateBeforeSave)

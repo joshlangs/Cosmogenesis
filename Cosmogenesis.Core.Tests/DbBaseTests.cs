@@ -16,7 +16,7 @@ public class DbBaseTests
         public new Task<DbDoc?> ReadByIdAsync(string id, PartitionKey partitionKey) => base.ReadByIdAsync(id, partitionKey);
         public new Task<DbDoc?[]> ReadByIdsAsync(IEnumerable<string> ids, PartitionKey partitionKey) => base.ReadByIdsAsync(ids, partitionKey);
         public new Task<CreateResult<T>> CreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc => base.CreateItemAsync(item, type, partitionKey, partitionKeyString);
-        public new Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc => base.CreateOrReplaceItemAsync(item, type, partitionKey, partitionKeyString);
+        public new Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc => base.CreateOrReplaceItemAsync(item, type, partitionKey, partitionKeyString, allowTtl);
         public new Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool tryCreateFirst) where T : DbDoc => base.ReadOrCreateItemAsync(item, type, partitionKey, partitionKeyString, tryCreateFirst);
         public new Task<DbConflictType?> DeleteItemAsync<T>(T item, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc => base.DeleteItemAsync(item, partitionKey, partitionKeyString);
     }
@@ -147,38 +147,38 @@ public class DbBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task CreateOrReplaceItemAsync_NullItem_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync<TestDoc>(null!, Type, PartitionKey, PartitionKeyString));
+    public async Task CreateOrReplaceItemAsync_NullItem_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync<TestDoc>(null!, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task CreateOrReplaceItemAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, null!, PartitionKey, PartitionKeyString));
+    public async Task CreateOrReplaceItemAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, null!, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task CreateOrReplaceItemAsync_NullPk_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, null!));
+    public async Task CreateOrReplaceItemAsync_NullPk_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, null!, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task CreateOrReplaceItemAsync_ReadOnly_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb(true).CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString));
+    public async Task CreateOrReplaceItemAsync_ReadOnly_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb(true).CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
     public async Task CreateOrReplaceItemAsync_NullItemId_Throws()
     {
         TestDocWithoutETag.id = null!;
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false));
     }
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task CreateOrReplaceItemAsync_NonNullItemETag_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString));
+    public async Task CreateOrReplaceItemAsync_NonNullItemETag_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
     public async Task CreateOrReplaceItemAsync_WrongItemPK_Throws()
     {
         TestDocWithoutETag.pk += "a";
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false));
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public class DbBaseTests
             pk = PartitionKeyString,
             Type = TestDocWithETag.Type + "a"
         };
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().CreateOrReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString, false));
     }
 
 
@@ -248,38 +248,38 @@ public class DbBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReplaceItemAsync_NullItem_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync<TestDoc>(null!, Type, PartitionKey, PartitionKeyString));
+    public async Task ReplaceItemAsync_NullItem_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync<TestDoc>(null!, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReplaceItemAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, null!, PartitionKey, PartitionKeyString));
+    public async Task ReplaceItemAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, null!, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReplaceItemAsync_NullPk_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, null!));
+    public async Task ReplaceItemAsync_NullPk_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, null!, false));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReplaceItemAsync_ReadOnly_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb(true).ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString));
+    public async Task ReplaceItemAsync_ReadOnly_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb(true).ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
     public async Task ReplaceItemAsync_NullItemId_Throws()
     {
         TestDocWithETag.id = null!;
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString, false));
     }
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReplaceItemAsync_NullItemETag_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString));
+    public async Task ReplaceItemAsync_NullItemETag_Throws() => await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false));
 
     [Fact]
     [Trait("Type", "Unit")]
     public async Task ReplaceItemAsync_WrongItemPK_Throws()
     {
         TestDocWithETag.pk += "a";
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(TestDocWithETag, Type, PartitionKey, PartitionKeyString, false));
     }
 
     [Fact]
@@ -293,7 +293,7 @@ public class DbBaseTests
             Type = TestDocWithETag.Type + "a",
             _etag = TestDocWithETag._etag
         };
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateDb().ReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString, false));
     }
 
 
@@ -583,7 +583,7 @@ public class DbBaseTests
         MockSerializer.Setup(x => x.FromStream<TestDoc>(ms)).Returns(TestDocWithETag).Verifiable();
         MockContainer.Setup(x => x.UpsertItemStreamAsync(ms, PartitionKey, null, It.IsAny<CancellationToken>())).Returns(Task.FromResult(MockResponseMessage.Object)).Verifiable();
 
-        var result = await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString);
+        var result = await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false);
 
         Assert.Same(TestDocWithETag, result.Document);
         MockSerializer.Verify();
@@ -604,7 +604,7 @@ public class DbBaseTests
         MockContainer.Setup(x => x.UpsertItemStreamAsync(ms, PartitionKey, null, It.IsAny<CancellationToken>())).Returns(Task.FromResult(MockResponseMessage.Object)).Verifiable();
         TestDocWithoutETag.pk = null!;
 
-        await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString);
+        await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false);
 
         Assert.Equal(PartitionKeyString, TestDocWithoutETag.pk);
     }
@@ -626,7 +626,7 @@ public class DbBaseTests
         MockSerializer.Setup(x => x.FromStream<TestDoc>(ms)).Returns(TestDocWithETag).Verifiable();
         MockContainer.Setup(x => x.UpsertItemStreamAsync(ms, PartitionKey, null, It.IsAny<CancellationToken>())).Returns(Task.FromResult(MockResponseMessage.Object)).Verifiable();
 
-        await CreateDb().CreateOrReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString);
+        await CreateDb().CreateOrReplaceItemAsync(doc, Type, PartitionKey, PartitionKeyString, false);
 
         Assert.Equal(Type, doc.Type);
     }
@@ -643,7 +643,7 @@ public class DbBaseTests
         MockSerializer.Setup(x => x.FromStream<TestDoc>(ms)).Returns(TestDocWithETag).Verifiable();
         MockContainer.Setup(x => x.UpsertItemStreamAsync(ms, PartitionKey, null, It.IsAny<CancellationToken>())).Returns(Task.FromResult(MockResponseMessage.Object)).Verifiable();
 
-        await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString);
+        await CreateDb().CreateOrReplaceItemAsync(TestDocWithoutETag, Type, PartitionKey, PartitionKeyString, false);
 
         Assert.True(Math.Abs(TestDocWithoutETag.CreationDate.Subtract(DateTime.UtcNow).TotalSeconds) < 5);
     }

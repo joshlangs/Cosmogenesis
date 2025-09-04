@@ -64,7 +64,7 @@ Create some documents and sprinkle in some attributes
 
 `[Mutable]` marks a document which has properties that can change.  Without it, `Replace` functions will not be generated.
 
-`[Transient]` marks a document which can be deleted.  Without it, `Delete` functions will not be generated.
+`[Transient]` marks a document which can be deleted.  Without it, `Delete` functions will not be generated.  Optionally sets a document's ttl to auto-expire.
 
 `[UseDefault]` can be used on properties that don't always need initialization.  Methods like `Create` generate parameters with default values for you.
 

@@ -12,7 +12,7 @@ static class ValidationExtensions
             outputModel.Report(diag, symbol, name);
         }
     }
-    public static void ValidateNamespace(this string? @namespace, OutputModel outputModel, ISymbol symbol) => ValidateNames(outputModel, symbol, @namespace?.Split('.') ?? new string[] { null! });
+    public static void ValidateNamespace(this string? @namespace, OutputModel outputModel, ISymbol symbol) => ValidateNames(outputModel, symbol, @namespace?.Split('.') ?? [null!]);
     static DiagnosticDescriptor? ValidateName(string? name)
     {
         if (string.IsNullOrEmpty(name))

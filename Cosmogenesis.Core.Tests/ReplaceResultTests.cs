@@ -39,7 +39,7 @@ public class ReplaceResultTests
         Assert.Null(ReplaceResult<TestDoc>.Missing.Document);
         Assert.Equal(DbConflictType.Missing, ReplaceResult<TestDoc>.Missing.Conflict);
     }
-    
+
     [Fact]
     [Trait("Type", "Unit")]
     public void Ctor_Doc_HasDoc()

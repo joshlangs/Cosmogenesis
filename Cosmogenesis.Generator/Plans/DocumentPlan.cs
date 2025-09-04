@@ -12,6 +12,8 @@ class DocumentPlan
     public string FullTypeName = default!;
     public bool IsMutable;
     public bool IsTransient;
+    public bool AutoExpires;
+    public int? DefaultTtl;
     public readonly Dictionary<string, PropertyPlan> PropertiesByName = new();
     public readonly Dictionary<string, PropertyPlan> PropertiesByArgumentName = new();
     public string ConstDocType = default!;

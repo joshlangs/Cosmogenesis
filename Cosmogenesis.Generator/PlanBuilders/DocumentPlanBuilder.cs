@@ -66,6 +66,8 @@ static class DocumentPlanBuilder
                                     ClassModel = classModel,
                                     IsMutable = classModel.MutableAttribute is not null,
                                     IsTransient = classModel.TransientAttribute is not null,
+                                    AutoExpires = classModel.TransientAttribute?.AutoExpires ?? false,
+                                    DefaultTtl = classModel.TransientAttribute?.DefaultTtl,
                                     ClassName = name,
                                     ClassNameArgument = name.ToArgumentName(),
                                     PluralName = name.Pluralize(),

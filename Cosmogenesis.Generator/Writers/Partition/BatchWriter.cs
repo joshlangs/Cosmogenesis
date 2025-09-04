@@ -153,7 +153,7 @@ public class {partitionPlan.BatchClassName} : Cosmogenesis.Core.DbBatchBase
     /// <summary>
     /// Queue a {documentPlan.ClassName} for creation in the batch
     /// </summary>
-    public virtual {databasePlan.Namespace}.{partitionPlan.BatchClassName} Create{documentPlan.ClassName}({documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters()}) =>
+    public virtual {databasePlan.Namespace}.{partitionPlan.BatchClassName} Create{documentPlan.ClassName}({documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters(documentPlan)}) =>
         this.Create({documentPlan.ClassNameArgument}: new {documentPlan.FullTypeName} {{ {partitionPlan.AsSettersFromDocumentPlanAndPartitionClass(documentPlan)} }});
 ";
 
@@ -174,7 +174,7 @@ public class {partitionPlan.BatchClassName} : Cosmogenesis.Core.DbBatchBase
     /// <summary>
     /// Queue a {documentPlan.ClassName} for creation or replacement in the batch
     /// </summary>
-    public virtual {databasePlan.Namespace}.{partitionPlan.BatchClassName} CreateOrReplace{documentPlan.ClassName}({documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters()}) =>
+    public virtual {databasePlan.Namespace}.{partitionPlan.BatchClassName} CreateOrReplace{documentPlan.ClassName}({documentPlan.PropertiesByName.Values.Where(x => !partitionPlan.GetPkPlan.ArgumentByPropertyName.ContainsKey(x.PropertyName)).AsInputParameters(documentPlan)}) =>
         this.CreateOrReplace({documentPlan.ClassNameArgument}: new {documentPlan.FullTypeName} {{ {partitionPlan.AsSettersFromDocumentPlanAndPartitionClass(documentPlan)} }});
 ";
 
