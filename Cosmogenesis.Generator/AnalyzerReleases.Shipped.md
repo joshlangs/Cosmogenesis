@@ -33,6 +33,7 @@ GEN023 | CodeGen | Error | Errors
 GEN024 | CodeGen | Error | Errors
 GEN025 | CodeGen | Error | Errors
 GEN026 | CodeGen | Error | Errors
+GEN027 | CodeGen | Error | Errors
 WGEN001 | CodeGen | Error | Warnings
 WGEN002 | CodeGen | Error | Warnings
 WGEN003 | CodeGen | Error | Warnings

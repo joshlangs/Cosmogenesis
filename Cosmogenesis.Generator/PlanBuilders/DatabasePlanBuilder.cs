@@ -49,6 +49,8 @@ static class DatabasePlanBuilder
             {
                 outputModel.Report(Diagnostics.Errors.DuplicateDocType, documentPlan.ClassModel.ClassSymbol, documentPlan.DocType);
             }
+            databasePlan.AllowTtl = databasePlan.PartitionPlansByName.Values.SelectMany(x => x.Documents).All(x => x.IsTransient);
+            databasePlan.MustHaveTtl = databasePlan.PartitionPlansByName.Values.SelectMany(x => x.Documents).Any(x => x.AutoExpires && x.DefaultTtl != -1);
         }
     }
     static void Initialize(OutputModel outputModel, ClassModel? classModel, OutputPlan outputPlan, DbAttributeModel dbAttribute)

@@ -33,6 +33,7 @@ static class Diagnostics
         public static readonly DiagnosticDescriptor NullableContext = Create("GEN024", "The assembly should default to a nullable context (add <Nullable>enable</Nullable> in a PropertyGroup inside your .csproj)");
         public static readonly DiagnosticDescriptor UseDefaultNullable = Create("GEN025", "[UseDefault] cannot be used on a reference type unless it is nullable");
         public static readonly DiagnosticDescriptor ParameterlessConstructor = Create("GEN026", "Documents must have an accessible constructor with no parameters");
+        public static readonly DiagnosticDescriptor InvalidAutoExpiryTtl = Create("GEN027", "Transient auto-expiry ttl must be either -1 or greater than zero");
     }
     public static class Warnings
     {

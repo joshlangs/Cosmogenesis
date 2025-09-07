@@ -56,10 +56,13 @@ public abstract class DbBase
             {
                 throw new InvalidOperationException($"The container's partition key path should be '/pk' but instead is '{settings.PartitionKeyPath}'");
             }
+            ValidateContainerDefaultTtl(settings.DefaultTimeToLive);
             return;
         }
         throw new InvalidOperationException("The container does not yet seem to exist");
     }
+
+    protected abstract void ValidateContainerDefaultTtl(int? ttl);
 
     public async virtual Task WarmupAsync(CancellationToken cancellationToken = default)
     {
@@ -249,6 +252,10 @@ public abstract class DbBase
         {
             throw new InvalidOperationException($"The document .Type property does not match what was expected ({type})");
         }
+        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
+        {
+            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
+        }
 
         Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
         item.CreationDate = DateTime.UtcNow;
@@ -319,6 +326,10 @@ public abstract class DbBase
         {
             throw new InvalidOperationException($"The document .ttl property must be null");
         }
+        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
+        {
+            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
+        }
 
         Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
         item.CreationDate = DateTime.UtcNow;
@@ -387,6 +398,10 @@ public abstract class DbBase
         else if (item.Type != type)
         {
             throw new InvalidOperationException($"The document .type property does not match what was expected ({type})");
+        }
+        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
+        {
+            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
         }
 
         Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
@@ -478,6 +493,10 @@ public abstract class DbBase
         if (item.ttl.HasValue && !allowTtl)
         {
             throw new InvalidOperationException($"The document .ttl property must be null");
+        }
+        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
+        {
+            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
         }
 
         if (ValidateStateBeforeSave)

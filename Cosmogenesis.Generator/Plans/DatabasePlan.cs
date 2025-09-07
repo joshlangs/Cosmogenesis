@@ -23,4 +23,6 @@ class DatabasePlan
     public string ChangeFeedProcessorClassName = default!;
     public string BatchHandlersClassName = default!;
     public string BatchHandlersArgumentName = default!;
+    public bool AllowTtl;
+    public bool MustHaveTtl;
 }

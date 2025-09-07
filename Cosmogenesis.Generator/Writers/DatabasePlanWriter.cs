@@ -30,6 +30,12 @@ public class {databasePlan.DbClassName} : Cosmogenesis.Core.DbBase
     {databasePlan.Namespace}.{databasePlan.PartitionsClassName}? partition;
     public virtual {databasePlan.Namespace}.{databasePlan.PartitionsClassName} Partition => this.partition ??= new(this);
 
+    protected override void ValidateContainerDefaultTtl(int? ttl)
+    {{
+        {(databasePlan.MustHaveTtl ? "if (!ttl.HasValue) { throw new InvalidOperationException(\"The container's default ttl is missing (disabled), but has documents which must auto-expire\"); }" : "")}
+        {(databasePlan.AllowTtl ? "" : $"if (ttl.HasValue && ttl.Value != -1) {{ throw new InvalidOperationException($\"The container's default ttl is {{ttl.Value}}, but not all documents are transient\"); }}")}
+    }}
+
     internal new System.Threading.Tasks.Task<T?> ReadByIdAsync<T>(
         string id, 
         Microsoft.Azure.Cosmos.PartitionKey partitionKey, 

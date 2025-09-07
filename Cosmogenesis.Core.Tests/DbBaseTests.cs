@@ -19,6 +19,7 @@ public class DbBaseTests
         public new Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc => base.CreateOrReplaceItemAsync(item, type, partitionKey, partitionKeyString, allowTtl);
         public new Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool tryCreateFirst) where T : DbDoc => base.ReadOrCreateItemAsync(item, type, partitionKey, partitionKeyString, tryCreateFirst);
         public new Task<DbConflictType?> DeleteItemAsync<T>(T item, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc => base.DeleteItemAsync(item, partitionKey, partitionKeyString);
+        protected override void ValidateContainerDefaultTtl(int? ttl) { }
     }
     public class ReadByIdsAsyncDb : DbBase
     {
@@ -33,6 +34,7 @@ public class DbBaseTests
 #pragma warning restore CS8609 // Nullability of reference types in return type doesn't match overridden member.
         public virtual Task<T?> MockReadByIdAsync<T>(string id, PartitionKey partitionKey, string type) where T : DbDoc => throw new NotImplementedException();
         public virtual Task<DbDoc?> MockReadByIdAsync(string id, PartitionKey partitionKey) => throw new NotImplementedException();
+        protected override void ValidateContainerDefaultTtl(int? ttl) { }
     }
 
     readonly Mock<Container> MockContainer = new(MockBehavior.Strict);

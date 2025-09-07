@@ -57,6 +57,10 @@ static class DocumentPlanBuilder
                             {
                                 outputModel.Report(Diagnostics.Errors.NoGetPk, classModel.ClassSymbol);
                             }
+                            else if (classModel.TransientAttribute?.DefaultTtl.HasValue == true && (classModel.TransientAttribute.DefaultTtl.Value < -1 || classModel.TransientAttribute.DefaultTtl.Value == 0))
+                            {
+                                outputModel.Report(Diagnostics.Errors.InvalidAutoExpiryTtl, classModel.ClassSymbol);
+                            }
                             else
                             {
                                 var documentPlan = new DocumentPlan
