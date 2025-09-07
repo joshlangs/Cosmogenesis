@@ -26,7 +26,9 @@ public abstract class DbSerializerBase : CosmosSerializer
                 new JsonStringEnumConverter(),
                 BigFractionConverter.Instance,
                 IPAddressConverter.Instance,
-                DateOnlyConverter.Instance
+                DateOnlyConverter.Instance,
+                Int128Converter.Instance,
+                UInt128Converter.Instance
             },
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };

@@ -9,12 +9,12 @@ You define some documents, sprinkle in a couple [attribute]s, and Cosmogenesis s
 - A *Database*...
   - Contains multiple *Partitions*
   - Is logically the same as a CosmosDB Container
-  - Is defined using the [Db] attribute
+  - Is defined using the `[Db]` attribute
 
 - A *Partition*...
   - Contains multiple *Documents*
   - All share the same CosmosDB Partition Key
-  - Is defined using the [Partition] attribute
+  - Is defined using the `[Partition]` attribute
   - Has a key calculated using a static method you define named `GetPk`
 
 - A *Document*...
@@ -70,7 +70,7 @@ Create some documents and sprinkle in some attributes
 
 `[PartitionDefinition]` can be used on a static class containing static methods, each of which will define a new partition.  Instead of the implicit `GetPk` method, the static methods in this class are used to generate the partition keys.
 
-`[DocType("SomeType")]` can be used to control the `Type` property which exists on all `DbDoc` documents.  By default, a class named `OrderDoc` would have a Type value of `Order`, but you can override this with [DocType].
+`[DocType("SomeType")]` can be used to control the `Type` property which exists on all `DbDoc` documents.  By default, a class named `OrderDoc` would have a Type value of `Order`, but you can override this with `[DocType]`.
 
 
 ## Examples
@@ -273,7 +273,7 @@ These conversions should be kept in mind while constructing queries.
 
 ### Decimal, BigFraction, BigInteger and Int64 (long, ulong)
 
-`long` `ulong` `decimal` `BigInteger` and `BigFraction` will be serialized into a string.
+`long` `ulong` `decimal` `Int128` `UInt128` `BigInteger` and `BigFraction` will be serialized into a string.
 
 This avoids the large integer JSON data-loss problem and CosmosDB numeric type limitations.
 
@@ -295,7 +295,7 @@ When deserializing, `DateTime` properties will always be deserialized into UTC, 
 
 ### Enum
 
-Cosmogenesis uses the built-in [JsonStringEnumConverter] converter with default values.
+Cosmogenesis uses the built-in `[JsonStringEnumConverter]` converter with default values.
 
 ### IPAddress
 
