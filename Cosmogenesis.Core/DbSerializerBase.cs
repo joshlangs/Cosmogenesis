@@ -2,7 +2,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Cosmogenesis.Core.Converters;
 using Epoche.Shared.Json;
 using Microsoft.Azure.Cosmos;
 
@@ -10,37 +9,30 @@ namespace Cosmogenesis.Core;
 
 public abstract class DbSerializerBase : CosmosSerializer
 {
-    static JsonSerializerOptions CreateJsonSerializerOptions(JsonIgnoreCondition defaultIgnoreCondition, bool withMagic)
+    static JsonSerializerOptions CreateJsonSerializerOptions(JsonIgnoreCondition defaultIgnoreCondition) => new JsonSerializerOptions
     {
-        var o = new JsonSerializerOptions
+        DefaultIgnoreCondition = defaultIgnoreCondition,
+        Converters =
         {
-            DefaultIgnoreCondition = defaultIgnoreCondition,
-            Converters =
-            {
-                ByteArrayConverter.Instance,
-                Int64Converter.Instance,
-                UInt64Converter.Instance,
-                IsoDateTimeConverter.Instance,
-                DecimalConverter.Instance,
-                BigIntegerConverter.Instance,
-                new JsonStringEnumConverter(),
-                BigFractionConverter.Instance,
-                IPAddressConverter.Instance,
-                DateOnlyConverter.Instance,
-                Int128Converter.Instance,
-                UInt128Converter.Instance
-            },
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-        if (withMagic)
-        {
-            o.Converters.Add(new MagicConverter());
-        }
-        return o;
-    }
+            ByteArrayConverter.Instance,
+            Int64Converter.Instance,
+            UInt64Converter.Instance,
+            IsoDateTimeConverter.Instance,
+            DecimalConverter.Instance,
+            BigIntegerConverter.Instance,
+            new JsonStringEnumConverter(),
+            BigFractionConverter.Instance,
+            IPAddressConverter.Instance,
+            DateOnlyConverter.Instance,
+            Int128Converter.Instance,
+            UInt128Converter.Instance
+        },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
+    };
 
-    protected virtual JsonSerializerOptions SerializeOptions { get; } = CreateJsonSerializerOptions(JsonIgnoreCondition.Never, withMagic: false);
-    protected virtual JsonSerializerOptions DeserializeOptions { get; } = CreateJsonSerializerOptions(JsonIgnoreCondition.WhenWritingNull, withMagic: true);
+    protected virtual JsonSerializerOptions SerializeOptions { get; } = CreateJsonSerializerOptions(JsonIgnoreCondition.Never);
+    protected virtual JsonSerializerOptions DeserializeOptions { get; } = CreateJsonSerializerOptions(JsonIgnoreCondition.WhenWritingNull);
 
     public override Stream ToStream<T>(T input)
     {

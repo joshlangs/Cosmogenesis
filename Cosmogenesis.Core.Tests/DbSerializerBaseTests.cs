@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Cosmogenesis.Core.Tests;
@@ -6,6 +7,13 @@ namespace Cosmogenesis.Core.Tests;
 public class DbSerializerBaseTests
 {
     static string StreamToString(Stream stream) => Encoding.UTF8.GetString(stream.ToSpan().ToArray());
+
+
+    class TestClass
+    {
+        public List<string> Stuff { get; } = new();
+    }
+
 
     public class NullSerializer : DbSerializerBase
     {
@@ -172,6 +180,13 @@ public class DbSerializerBaseTests
             var vals = new[] { 4, 5, 6 };
             var s = ToStream(new { Documents = vals });
             Assert.Equal(vals, DeserializeDocumentList<int>(s));
+        }
+
+        [Fact]
+        public void Deserialize_ReadOnlyCollection_Populates()
+        {
+            var obj = JsonSerializer.Deserialize<TestClass>("{\"Stuff\":[\"a\",\"bb\"]}", DeserializeOptions);
+            Assert.Equal(obj!.Stuff.ToArray().AsSpan(), ["a", "bb"]);
         }
     }
 
