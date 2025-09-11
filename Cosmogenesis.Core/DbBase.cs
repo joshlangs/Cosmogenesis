@@ -26,9 +26,10 @@ public abstract class DbBase
         bool isReadOnly,
         bool validateStateBeforeSave)
     {
-
-        Container = container ?? throw new ArgumentNullException(nameof(container));
-        Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(container);
+        ArgumentNullException.ThrowIfNull(serializer);
+        Container = container;
+        Serializer = serializer;
         IsReadOnly = isReadOnly;
         ValidateStateBeforeSave = validateStateBeforeSave;
     }
@@ -87,10 +88,7 @@ public abstract class DbBase
 
     protected virtual async Task<DbDoc?> ReadByIdAsync(string id, PartitionKey partitionKey)
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
         using var result = await Container.ReadItemStreamAsync(
             id: id,
@@ -113,14 +111,8 @@ public abstract class DbBase
 
     protected virtual async Task<T?> ReadByIdAsync<T>(string id, PartitionKey partitionKey, string type) where T : DbDoc
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(type);
 
         var doc = await ReadByIdAsync(id, partitionKey).ConfigureAwait(false);
         if (doc is null)
@@ -136,21 +128,18 @@ public abstract class DbBase
 
     protected virtual async Task<DbDoc?[]> ReadByIdsAsync(IEnumerable<string> ids, PartitionKey partitionKey)
     {
-        if (ids is null)
-        {
-            throw new ArgumentNullException(nameof(ids));
-        }
+        ArgumentNullException.ThrowIfNull(ids);
 
         var idList = ids.Select(x => x ?? throw new ArgumentNullException(nameof(ids))).ToArray() ?? throw new ArgumentNullException(nameof(ids));
         if (idList.Length == 0)
         {
-            return Array.Empty<DbDoc?>();
+            return [];
         }
         if (idList.Length <= ReadIdsQueryThreshhold)
         {
             var readTasks = idList.Select(id => ReadByIdAsync(id: id, partitionKey: partitionKey)).ToList();
             await Task.WhenAll(readTasks).ConfigureAwait(false);
-            return readTasks.Select(x => x.Result).ToArray();
+            return [.. readTasks.Select(x => x.Result)];
         }
 
         var results = new DbDoc?[idList.Length];
@@ -184,14 +173,8 @@ public abstract class DbBase
     }
     protected virtual async Task<T?[]> ReadByIdsAsync<T>(IEnumerable<string> ids, PartitionKey partitionKey, string type) where T : DbDoc
     {
-        if (ids is null)
-        {
-            throw new ArgumentNullException(nameof(ids));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(ids);
+        ArgumentNullException.ThrowIfNull(type);
 
         var docs = await ReadByIdsAsync(ids, partitionKey).ConfigureAwait(false);
         var results = new T?[docs.Length];
@@ -213,18 +196,9 @@ public abstract class DbBase
 
     internal protected virtual async Task<CreateResult<T>> CreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (partitionKeyString is null)
-        {
-            throw new ArgumentNullException(nameof(partitionKeyString));
-        }
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(partitionKeyString);
 
         ThrowIfReadOnly();
 
@@ -283,18 +257,9 @@ public abstract class DbBase
 
     internal protected virtual async Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (partitionKeyString is null)
-        {
-            throw new ArgumentNullException(nameof(partitionKeyString));
-        }
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(partitionKeyString);
 
         ThrowIfReadOnly();
 
@@ -360,18 +325,9 @@ public abstract class DbBase
 
     internal protected virtual async Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool tryCreateFirst) where T : DbDoc
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (partitionKeyString is null)
-        {
-            throw new ArgumentNullException(nameof(partitionKeyString));
-        }
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(partitionKeyString);
 
         ThrowIfReadOnly();
 
@@ -459,18 +415,9 @@ public abstract class DbBase
 
     internal protected virtual async Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (partitionKeyString is null)
-        {
-            throw new ArgumentNullException(nameof(partitionKeyString));
-        }
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(partitionKeyString);
 
         ThrowIfReadOnly();
 
@@ -524,14 +471,8 @@ public abstract class DbBase
 
     internal protected virtual async Task<DbConflictType?> DeleteItemAsync<T>(T item, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-        if (partitionKeyString is null)
-        {
-            throw new ArgumentNullException(nameof(partitionKeyString));
-        }
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(partitionKeyString);
 
         ThrowIfReadOnly();
 
@@ -568,10 +509,7 @@ public abstract class DbBase
         IQueryable<T> query,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        if (query is null)
-        {
-            throw new ArgumentNullException(nameof(query));
-        }
+        ArgumentNullException.ThrowIfNull(query);
 
         cancellationToken.ThrowIfCancellationRequested();
         var streamIterator = query.ToStreamIterator();
@@ -603,10 +541,7 @@ public abstract class DbBase
     public async Task<DbConflictType?> _DEBUGONLY_DANGEROUS_DIE_DIE_DIE_DeleteItemAsync<T>(T item) where T : DbDoc
 #pragma warning restore IDE1006 // Naming Styles
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         ThrowIfReadOnly();
 

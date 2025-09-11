@@ -10,7 +10,7 @@ static class GetPkIdPlanBuilder
         var plan = new GetPkIdPlan()
         {
             FullMethodName = $"{symbol.ContainingType.ToDisplayString()}.{symbol.Name}",
-            Arguments = symbol
+            Arguments = [.. symbol
                 .Parameters
                 .Select(x =>
                 {
@@ -46,8 +46,7 @@ static class GetPkIdPlanBuilder
                     }
                     outputModel.Report(Diagnostics.Errors.PropertyResolvePkId, symbol, arg.ArgumentName);
                     return arg;
-                })
-                .ToList()
+                })]
         };
         plan.ArgumentByPropertyName = plan.Arguments.Where(x => x.PropertyName is not null).ToDictionary(x => x.PropertyName);
         return plan;

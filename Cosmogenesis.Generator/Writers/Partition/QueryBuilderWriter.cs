@@ -23,7 +23,8 @@ public class {partitionPlan.QueryBuilderClassName} : Cosmogenesis.Core.DbQueryBu
             dbBase: {databasePlan.DbClassNameArgument},
             partitionKey: partitionKey)
     {{
-        {databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        {databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
     }}
 
 {string.Concat(partitionPlan.Documents.Select(BuildQuery))}

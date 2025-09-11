@@ -26,7 +26,7 @@ class UnionPlanBuilder
                     partitionPlan.Unions.Add(new UnionPlan
                     {
                         GetIdPlan = idPlan,
-                        Documents = union.ToList(),
+                        Documents = [.. union],
                         FullCommonTypeName = fullTypeName,
                         CommonName = commonName
                     });

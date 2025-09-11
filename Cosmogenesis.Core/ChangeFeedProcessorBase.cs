@@ -37,21 +37,19 @@ public abstract class ChangeFeedProcessorBase
         TimeSpan? pollInterval = null,
         DateTime? startTime = null)
     {
-        if (string.IsNullOrWhiteSpace(processorName))
-        {
-            throw new ArgumentNullException(nameof(processorName));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(processorName);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxItemsPerBatch, 1);
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(batchProcessor);
+        ArgumentNullException.ThrowIfNull(databaseContainer);
+        ArgumentNullException.ThrowIfNull(leaseContainer);
 
-        if (maxItemsPerBatch < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maxItemsPerBatch));
-        }
         if (maxItemsPerBatch > MaxMaxItemsPerBatch)
         {
             maxItemsPerBatch = MaxMaxItemsPerBatch;
         }
         MaxItemsPerBatch = maxItemsPerBatch;
-        Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        Serializer = serializer;
 
         PollInterval = pollInterval ?? DefaultPollInterval;
         if (PollInterval < TimeSpan.Zero)
@@ -67,10 +65,10 @@ public abstract class ChangeFeedProcessorBase
             PollInterval = MaxPollInterval;
         }
         StartTime = startTime ?? IsoDateCheater.MinValue;
-        BatchProcessor = batchProcessor ?? throw new ArgumentNullException(nameof(batchProcessor));
+        BatchProcessor = batchProcessor;
         ProcessorName = processorName;
-        DatabaseContainer = databaseContainer ?? throw new ArgumentNullException(nameof(databaseContainer));
-        LeaseContainer = leaseContainer ?? throw new ArgumentNullException(nameof(leaseContainer));
+        DatabaseContainer = databaseContainer;
+        LeaseContainer = leaseContainer;
     }
 
     protected virtual ChangeFeedProcessor CreateChangeFeedProcessor() => DatabaseContainer

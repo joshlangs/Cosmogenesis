@@ -23,7 +23,8 @@ public class {partitionPlan.CreateOrReplaceClassName}
 
     internal protected {partitionPlan.CreateOrReplaceClassName}({databasePlan.Namespace}.{partitionPlan.ClassName} {partitionPlan.ClassNameArgument})
     {{
-        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({partitionPlan.ClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({partitionPlan.ClassNameArgument});
+        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument};
     }}
 
 {string.Concat(partitionPlan.Documents.Select(x => CreateOrReplace(partitionPlan, x)))}

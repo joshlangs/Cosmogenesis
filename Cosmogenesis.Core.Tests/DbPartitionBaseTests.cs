@@ -5,11 +5,8 @@ namespace Cosmogenesis.Core.Tests;
 
 public class DbPartitionBaseTests
 {
-    class TestPartition : DbPartitionBase
+    class TestPartition(DbBase db, string partitionKey, DbSerializerBase serializer) : DbPartitionBase(db, partitionKey, serializer)
     {
-        public TestPartition(DbBase db, string partitionKey, DbSerializerBase serializer) : base(db, partitionKey, serializer)
-        {
-        }
         public new TransactionalBatch CreateBatchForPartition() => base.CreateBatchForPartition();
         public new Task<CreateResult<T>> CreateItemAsync<T>(T item, string type) where T : DbDoc => base.CreateItemAsync(item, type);
         public new Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, bool tryCreateFirst) where T : DbDoc => base.ReadOrCreateItemAsync(item, type, tryCreateFirst);
@@ -36,7 +33,7 @@ public class DbPartitionBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public void Ctor_EmptyPartitionKey_Throws() => Assert.Throws<ArgumentNullException>(() => new TestPartition(MockDb.Object, "", MockSerializer.Object));
+    public void Ctor_EmptyPartitionKey_Throws() => Assert.Throws<ArgumentException>(() => new TestPartition(MockDb.Object, "", MockSerializer.Object));
 
     [Fact]
     [Trait("Type", "Unit")]

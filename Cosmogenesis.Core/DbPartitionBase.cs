@@ -13,14 +13,13 @@ public abstract class DbPartitionBase
 
     protected DbPartitionBase(DbBase db, string partitionKey, DbSerializerBase serializer)
     {
-        if (string.IsNullOrEmpty(partitionKey))
-        {
-            throw new ArgumentNullException(nameof(partitionKey));
-        }
+        ArgumentNullException.ThrowIfNull(db);
+        ArgumentException.ThrowIfNullOrEmpty(partitionKey);
+        ArgumentNullException.ThrowIfNull(serializer);
 
-        DB = db ?? throw new ArgumentNullException(nameof(db));
+        DB = db;
         PartitionKeyString = partitionKey;
-        Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        Serializer = serializer;
         PartitionKey = new PartitionKey(partitionKey);
     }
 

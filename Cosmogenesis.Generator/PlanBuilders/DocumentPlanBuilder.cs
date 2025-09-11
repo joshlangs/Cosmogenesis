@@ -79,15 +79,14 @@ static class DocumentPlanBuilder
                                     GetIdPlan = new GetPkIdPlan
                                     {
                                         FullMethodName = $"{getId.MethodSymbol.ContainingType.ToDisplayString()}.{getId.MethodSymbol.Name}",
-                                        Arguments = getId
+                                        Arguments = [.. getId
                                             .MethodSymbol
                                             .Parameters
                                             .Select(x => new GetPkIdPlan.Argument
                                             {
                                                 ArgumentName = x.Name.ToArgumentName(),
                                                 FullTypeName = x.Type.ToDisplayString()
-                                            })
-                                            .ToList()
+                                            })]
                                     }
                                 };
 

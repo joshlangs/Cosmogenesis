@@ -19,7 +19,8 @@ public class {databasePlan.PartitionsClassName}
 
     internal protected {databasePlan.PartitionsClassName}({databasePlan.Namespace}.{databasePlan.DbClassName} {databasePlan.DbClassNameArgument})
     {{
-        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
     }}
 
 {string.Concat(databasePlan.PartitionPlansByName.Values.Select(x => Partition(databasePlan, x)))}

@@ -29,7 +29,8 @@ public class {partitionPlan.ReadManyClassName}
         {databasePlan.Namespace}.{databasePlan.DbClassName} {databasePlan.DbClassNameArgument},
         Microsoft.Azure.Cosmos.PartitionKey partitionKey)
     {{
-        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
         this.PartitionKey = partitionKey;
     }}
 

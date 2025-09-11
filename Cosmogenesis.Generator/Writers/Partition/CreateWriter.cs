@@ -18,7 +18,8 @@ public class {partitionPlan.CreateClassName}
 
     internal protected {partitionPlan.CreateClassName}({databasePlan.Namespace}.{partitionPlan.ClassName} {partitionPlan.ClassNameArgument})
     {{
-        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({partitionPlan.ClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({partitionPlan.ClassNameArgument});
+        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument};
     }}
 
 {string.Concat(partitionPlan.Documents.Select(x => Create(partitionPlan, x)))}

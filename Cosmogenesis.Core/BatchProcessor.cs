@@ -9,15 +9,13 @@ public class BatchProcessor
     protected BatchProcessor() { }
     public BatchProcessor(BatchHandlersBase batchHandlers)
     {
-        BatchHandlers = batchHandlers ?? throw new ArgumentNullException(nameof(batchHandlers));
+        ArgumentNullException.ThrowIfNull(batchHandlers);
+        BatchHandlers = batchHandlers;
     }
 
     public virtual async Task HandleAsync(IReadOnlyCollection<DbDoc> changes, CancellationToken cancellationToken)
     {
-        if (changes is null)
-        {
-            throw new ArgumentNullException(nameof(changes));
-        }
+        ArgumentNullException.ThrowIfNull(changes);
         if (changes.Count == 0)
         {
             return;

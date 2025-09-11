@@ -11,9 +11,9 @@ public abstract class DbBatchBase
     protected virtual TransactionalBatch TransactionalBatch { get; } = default!;
     protected string PartitionKey { get; } = default!;
 
-    readonly object LockObject = new();
-    readonly HashSet<string> IdsInBatch = new();
-    readonly List<Func<Stream, DbDoc?>?> DeserializeResults = new();
+    readonly Lock LockObject = new();
+    readonly HashSet<string> IdsInBatch = [];
+    readonly List<Func<Stream, DbDoc?>?> DeserializeResults = [];
     bool Executed;
     public virtual bool IsEmpty { get; private set; } = true;
 
@@ -27,9 +27,12 @@ public abstract class DbBatchBase
         string partitionKey,
         bool validateStateBeforeSave)
     {
-        Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        TransactionalBatch = transactionalBatch ?? throw new ArgumentNullException(nameof(transactionalBatch));
-        PartitionKey = partitionKey ?? throw new ArgumentNullException(nameof(partitionKey));
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(transactionalBatch);
+        ArgumentNullException.ThrowIfNull(partitionKey);
+        Serializer = serializer;
+        TransactionalBatch = transactionalBatch;
+        PartitionKey = partitionKey;
         ValidateStateBeforeSave = validateStateBeforeSave;
     }
 
@@ -59,10 +62,7 @@ public abstract class DbBatchBase
 
     static void EnsureIdExists(DbDoc? item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
         if (item.id is null)
         {
             throw new InvalidOperationException("The document .id property is missing");
@@ -83,10 +83,7 @@ public abstract class DbBatchBase
 
     static void SetOrMatchType(DbDoc item, string? type)
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
         if (item.Type is null)
         {
             item.Type = type;
@@ -119,10 +116,7 @@ public abstract class DbBatchBase
 
     static void EnsureMatchType(DbDoc item, string? type)
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
         if (item.Type != type)
         {
             throw new InvalidOperationException($"The document .type property does not match what was expected ({type})");

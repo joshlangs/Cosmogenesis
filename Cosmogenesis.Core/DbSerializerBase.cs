@@ -9,7 +9,7 @@ namespace Cosmogenesis.Core;
 
 public abstract class DbSerializerBase : CosmosSerializer
 {
-    static JsonSerializerOptions CreateJsonSerializerOptions(JsonIgnoreCondition defaultIgnoreCondition) => new JsonSerializerOptions
+    static JsonSerializerOptions CreateJsonSerializerOptions(JsonIgnoreCondition defaultIgnoreCondition) => new()
     {
         DefaultIgnoreCondition = defaultIgnoreCondition,
         Converters =
@@ -50,10 +50,7 @@ public abstract class DbSerializerBase : CosmosSerializer
     [return: MaybeNull]
     public override T FromStream<T>(Stream stream)
     {
-        if (stream is null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
+        ArgumentNullException.ThrowIfNull(stream);
 
         var item = FromStream<T>(stream.ToSpan());
         stream.Dispose();
@@ -90,10 +87,7 @@ public abstract class DbSerializerBase : CosmosSerializer
 
     public T Clone<T>(T original)
     {
-        if (original is null)
-        {
-            throw new ArgumentNullException(nameof(original));
-        }
+        ArgumentNullException.ThrowIfNull(original);
         return FromStream<T>(JsonSerializer.SerializeToUtf8Bytes(
             value: original,
             options: SerializeOptions))!;
@@ -103,10 +97,7 @@ public abstract class DbSerializerBase : CosmosSerializer
 
     public virtual List<T> DeserializeDocumentList<T>(Stream stream)
     {
-        if (stream is null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
+        ArgumentNullException.ThrowIfNull(stream);
 
         var data = stream.ToSpan();
         var reader = new Utf8JsonReader(data);

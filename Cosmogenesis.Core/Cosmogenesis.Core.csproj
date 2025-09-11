@@ -20,7 +20,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 
-		<Version>1.5.4</Version>
+		<Version>1.5.5</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

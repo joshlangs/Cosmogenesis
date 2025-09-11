@@ -9,8 +9,10 @@ public abstract class DbQueryBase
 
     protected DbQueryBase(DbBase dbBase, DbQueryBuilderBase queryBuilder)
     {
-        DbBase = dbBase ?? throw new ArgumentNullException(nameof(dbBase));
-        QueryBuilder = queryBuilder ?? throw new ArgumentNullException(nameof(queryBuilder));
+        ArgumentNullException.ThrowIfNull(dbBase);
+        ArgumentNullException.ThrowIfNull(queryBuilder);
+        DbBase = dbBase;
+        QueryBuilder = queryBuilder;
     }
 
     /// <summary>

@@ -11,16 +11,14 @@ public abstract class DbQueryBuilderBase
 
     protected DbQueryBuilderBase(DbBase dbBase, PartitionKey? partitionKey)
     {
-        DbBase = dbBase ?? throw new ArgumentNullException(nameof(dbBase));
+        ArgumentNullException.ThrowIfNull(dbBase);
+        DbBase = dbBase;
         PartitionKey = partitionKey;
     }
 
     protected virtual IQueryable<T> BuildQueryByType<T>(string type) where T : DbDoc
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
 
         return DbBase
             .Container
@@ -35,10 +33,7 @@ public abstract class DbQueryBuilderBase
 
     protected virtual IQueryable<T> BuildQueryByTypes<T>(string[] types) where T : DbDoc
     {
-        if (types is null)
-        {
-            throw new ArgumentNullException(nameof(types));
-        }
+        ArgumentNullException.ThrowIfNull(types);
 
         return DbBase
             .Container

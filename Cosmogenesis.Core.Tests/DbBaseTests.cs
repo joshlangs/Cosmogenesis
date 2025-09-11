@@ -493,7 +493,7 @@ public class DbBaseTests
 
         var result = await mockDb.Object.ReadByIdsAsync<TestDoc>(docs.Keys, PartitionKey, Type);
 
-        Assert.Equal(docs.Values.ToArray(), result.ToArray());
+        Assert.Equal([.. docs.Values], result.ToArray());
         Assert.Equal(Segments, count);
         mockDb.Verify();
         MockContainer.Verify();

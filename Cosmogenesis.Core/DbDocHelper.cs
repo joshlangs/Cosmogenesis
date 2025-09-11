@@ -8,10 +8,7 @@ public static class DbDocHelper
 
     public static string GetValidId(string id)
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
         if (id.Length > MaxIdBytes) // only actually works if ascii
         {

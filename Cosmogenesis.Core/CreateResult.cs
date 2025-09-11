@@ -15,7 +15,8 @@ public sealed class CreateResult<T> where T : DbDoc
     }
     internal CreateResult(T document)
     {
-        Document = document ?? throw new ArgumentNullException(nameof(document));
+        ArgumentNullException.ThrowIfNull(document);
+        Document = document;
     }
     public T? Document { get; }
     public DbConflictType? Conflict { get; }

@@ -5,13 +5,8 @@ namespace Cosmogenesis.Core.Tests;
 
 public class ChangeFeedProcessorBaseTests
 {
-#pragma warning disable IDE0060 // Remove unused parameter
-    public class TestChangeFeed : ChangeFeedProcessorBase
+    public class TestChangeFeed(DbSerializerBase serializer, Container databaseContainer, Container leaseContainer, string processorName, int maxItemsPerBatch, TimeSpan? pollInterval, DateTime? startTime, BatchProcessor batchProcessor) : ChangeFeedProcessorBase(batchProcessor, serializer, databaseContainer, leaseContainer, processorName, maxItemsPerBatch, pollInterval, startTime)
     {
-        public TestChangeFeed(DbSerializerBase serializer, Container databaseContainer, Container leaseContainer, string processorName, int maxItemsPerBatch, TimeSpan? pollInterval, DateTime? startTime, BatchProcessor batchProcessor) : base(batchProcessor, serializer, databaseContainer, leaseContainer, processorName, maxItemsPerBatch, pollInterval, startTime)
-        {
-        }
-
         protected sealed override ChangeFeedProcessor CreateChangeFeedProcessor() => MockCreateChangeFeedProcessor();
         public virtual ChangeFeedProcessor MockCreateChangeFeedProcessor() => throw new NotImplementedException();
 

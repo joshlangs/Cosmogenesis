@@ -4,13 +4,8 @@
 /// <summary>
 /// Specifies in which database a document exists.
 /// </summary>
-public sealed class DbAttribute : Attribute
+public sealed class DbAttribute(string name) : Attribute
 {
-    public readonly string Name;
+    public readonly string Name = name;
     public string? Namespace { get; set; }
-
-    public DbAttribute(string name)
-    {
-        Name = name;
-    }
 }

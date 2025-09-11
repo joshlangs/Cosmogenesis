@@ -24,8 +24,10 @@ public class {partitionPlan.QueryUnionsClassName} : Cosmogenesis.Core.DbQueryBas
             dbBase: {databasePlan.DbClassNameArgument},
             queryBuilder: {partitionPlan.QueryBuilderClassNameArgument})
     {{
-        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
-        this.{partitionPlan.QueryBuilderClassName} = {partitionPlan.QueryBuilderClassNameArgument} ?? throw new System.ArgumentNullException(nameof({partitionPlan.QueryBuilderClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        System.ArgumentNullException.ThrowIfNull({partitionPlan.QueryBuilderClassNameArgument});
+        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
+        this.{partitionPlan.QueryBuilderClassName} = {partitionPlan.QueryBuilderClassNameArgument};
     }}
 
 {string.Concat(partitionPlan.Unions.Select(x => Query(databasePlan, partitionPlan, x)))}

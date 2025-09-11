@@ -18,7 +18,8 @@ public class {databasePlan.ReadClassName}
 
     internal protected {databasePlan.ReadClassName}({databasePlan.Namespace}.{databasePlan.DbClassName} {databasePlan.DbClassNameArgument})
     {{
-        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
     }}
 
     /// <summary>

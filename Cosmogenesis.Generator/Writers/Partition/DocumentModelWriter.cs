@@ -4,10 +4,7 @@ namespace Cosmogenesis.Generator.Writers.Partition;
 static class DocumentModelWriter
 {
     public static string CreateAndCheckPkAndId(PartitionPlan partitionPlan, DocumentPlan documentPlan, string paramTypeName) => $@"
-        if ({paramTypeName} is null)
-        {{
-            throw new System.ArgumentNullException(nameof({paramTypeName}));
-        }}
+        System.ArgumentNullException.ThrowIfNull({paramTypeName});
         var calculatedPk = {partitionPlan.GetPkPlan.FullMethodName}({partitionPlan.GetPkPlan.DocumentToParametersMapping(paramTypeName)});
         var calculatedId = Cosmogenesis.Core.DbDocHelper.GetValidId({documentPlan.GetIdPlan.FullMethodName}({documentPlan.GetIdPlan.DocumentToParametersMapping(paramTypeName)}));
         if ({paramTypeName}.id is null)

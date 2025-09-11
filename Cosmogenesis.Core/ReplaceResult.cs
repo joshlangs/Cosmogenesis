@@ -17,7 +17,8 @@ public sealed class ReplaceResult<T> where T : DbDoc
     }
     internal ReplaceResult(T document)
     {
-        Document = document ?? throw new ArgumentNullException(nameof(document));
+        ArgumentNullException.ThrowIfNull(document);
+        Document = document;
     }
     public T? Document { get; }
     public DbConflictType? Conflict { get; }

@@ -4,12 +4,7 @@
 /// <summary>
 /// Specifies the .Type field assigned to a document.
 /// </summary>
-public sealed class DocTypeAttribute : Attribute
+public sealed class DocTypeAttribute(string name) : Attribute
 {
-    public readonly string Name;
-
-    public DocTypeAttribute(string name)
-    {
-        Name = name;
-    }
+    public readonly string Name = name;
 }

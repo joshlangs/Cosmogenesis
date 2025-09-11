@@ -15,7 +15,8 @@ public sealed class CreateOrReplaceResult<T> where T : DbDoc
 
     internal CreateOrReplaceResult(T document, bool alreadyExisted)
     {
-        Document = document ?? throw new ArgumentNullException(nameof(document));
+        ArgumentNullException.ThrowIfNull(document);
+        Document = document;
         AlreadyExisted = alreadyExisted;
     }
 }

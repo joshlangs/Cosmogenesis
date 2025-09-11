@@ -25,7 +25,8 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
             partitionKey: {partitionPlan.GetPkPlan.FullMethodName}({partitionPlan.GetPkPlan.DocumentToParametersMapping("pkData")}),
             serializer: {databasePlan.Namespace}.{databasePlan.SerializerClassName}.Instance)
     {{
-        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        this.{databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
         {PkClassSetter(partitionPlan)}
     }}
 
@@ -162,11 +163,14 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     /// </summary>
     /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
     /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
-    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.ReplaceResult<{documentPlan.FullTypeName}>> ReplaceAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument}) =>
-        this.ReplaceItemAsync(
-            item: {documentPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({documentPlan.ClassNameArgument})), 
+    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.ReplaceResult<{documentPlan.FullTypeName}>> ReplaceAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
+    {{
+        System.ArgumentNullException.ThrowIfNull({documentPlan.ClassNameArgument});
+        return this.ReplaceItemAsync(
+            item: {documentPlan.ClassNameArgument},
             type: {documentPlan.ConstDocType},
             allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
+    }}
 ";
 
     static string DeleteIfTransient(DocumentPlan documentPlan) =>
@@ -178,9 +182,11 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     /// </summary>
     /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
     /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
-    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.DbConflictType?> DeleteAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument}) =>
-        this.DeleteItemAsync(
-            item: {documentPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({documentPlan.ClassNameArgument})));
+    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.DbConflictType?> DeleteAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
+    {{
+        System.ArgumentNullException.ThrowIfNull({documentPlan.ClassNameArgument});
+        return this.DeleteItemAsync(item: {documentPlan.ClassNameArgument});
+    }}
 ";
 
     static string Create(PartitionPlan partitionPlan, DocumentPlan documentPlan) => $@"

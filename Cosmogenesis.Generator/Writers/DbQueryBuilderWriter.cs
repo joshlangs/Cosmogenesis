@@ -24,7 +24,8 @@ public class {databasePlan.QueryBuilderClassName} : Cosmogenesis.Core.DbQueryBui
             dbBase: {databasePlan.DbClassNameArgument},
             partitionKey: null)
     {{
-        {databasePlan.DbClassName} = {databasePlan.DbClassNameArgument} ?? throw new System.ArgumentNullException(nameof({databasePlan.DbClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({databasePlan.DbClassNameArgument});
+        {databasePlan.DbClassName} = {databasePlan.DbClassNameArgument};
     }}
 
 {string.Concat(databasePlan.PartitionPlansByName.Values.SelectMany(x => x.Documents).Select(BuildQuery))}

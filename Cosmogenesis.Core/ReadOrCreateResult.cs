@@ -15,7 +15,8 @@ public sealed class ReadOrCreateResult<T> where T : DbDoc
 
     internal ReadOrCreateResult(T document, bool alreadyExisted)
     {
-        Document = document ?? throw new ArgumentNullException(nameof(document));
+        ArgumentNullException.ThrowIfNull(document);
+        Document = document;
         AlreadyExisted = alreadyExisted;
     }
 }

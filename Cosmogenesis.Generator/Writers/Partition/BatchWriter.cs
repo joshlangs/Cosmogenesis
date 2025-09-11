@@ -27,7 +27,8 @@ public class {partitionPlan.BatchClassName} : Cosmogenesis.Core.DbBatchBase
             serializer: {databasePlan.Namespace}.{databasePlan.SerializerClassName}.Instance,
             validateStateBeforeSave: validateStateBeforeSave)
     {{
-        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument} ?? throw new System.ArgumentNullException(nameof({partitionPlan.ClassNameArgument}));
+        System.ArgumentNullException.ThrowIfNull({partitionPlan.ClassNameArgument});
+        this.{partitionPlan.ClassName} = {partitionPlan.ClassNameArgument};
     }}
 
     /// <summary>
