@@ -48,6 +48,7 @@ public abstract class DbDoc
     /// Identifies the type of document.  Used internally for querying and serialization.
     /// Internal property - do not set manually.
     /// </summary>    
+    [JsonPropertyOrder(int.MinValue)]
     public string Type
     {
         get => type;

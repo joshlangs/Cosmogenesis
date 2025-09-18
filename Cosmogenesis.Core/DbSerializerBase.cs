@@ -51,10 +51,10 @@ public abstract class DbSerializerBase : CosmosSerializer
     public override T FromStream<T>(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
-
-        var item = FromStream<T>(stream.ToSpan());
-        stream.Dispose();
-        return item;
+        using (stream)
+        {
+            return FromStream<T>(stream.ToSpan());
+        }
     }
 
     [return: MaybeNull]

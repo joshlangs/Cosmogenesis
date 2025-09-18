@@ -20,13 +20,13 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 
-		<Version>1.5.5</Version>
+		<Version>1.5.6</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Epoche.Shared" Version="1.1.6" />
+		<PackageReference Include="Epoche.Shared" Version="1.1.8" />
 		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.53.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>

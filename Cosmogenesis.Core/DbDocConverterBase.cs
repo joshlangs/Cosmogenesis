@@ -13,13 +13,13 @@ public abstract class DbDocConverterBase : JsonConverter<DbDoc>
         {
             throw new NotSupportedException($"We don't understand how to deserialize this message");
         }
-        var end = reader.BytesConsumed;
+        var end = reader.BytesConsumed;        
         using var ms = new MemoryStream((int)(end - start + 1));
         using var writer = new Utf8JsonWriter(ms);
         doc.WriteTo(writer);
         writer.Flush();
         var type = value.GetString();
-        return DeserializeByType(ms.ToSpan(), type, options) ?? throw new NotSupportedException($"We cannot deserialize {type} into null");
+        return DeserializeByType(ms.GetDataSpan(), type, options) ?? throw new NotSupportedException($"We cannot deserialize {type} into null");
     }
 
     protected abstract DbDoc? DeserializeByType(ReadOnlySpan<byte> data, string? type, JsonSerializerOptions options);
