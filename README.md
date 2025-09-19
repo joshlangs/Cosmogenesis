@@ -191,12 +191,12 @@ await db
     .OrderAsync(
         accountId: acctId,
         orderNumber: DateTime.Now.ToString(),
-        items: new[]
-        {
+        items:
+        [
             new OrderDoc.Item { ItemCode = "abc", Quantity = 1, UnitCost = 1.99m },
             new OrderDoc.Item { ItemCode = "def", Quantity = 100, UnitCost = 999 }
-        },
-        notes: new List<string>() { "This person is pretty evil", "Be careful!" },
+        ],
+        notes: ["This person is pretty evil", "Be careful!"],
         totalPrice: 99901.99m)
     .ThrowOnConflict();
 

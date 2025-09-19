@@ -11,7 +11,7 @@ public class DbSerializerBaseTests
 
     class TestClass
     {
-        public List<string> Stuff { get; } = new();
+        public List<string> Stuff { get; } = [];
     }
 
 

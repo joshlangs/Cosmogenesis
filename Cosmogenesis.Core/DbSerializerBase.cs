@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,6 +10,8 @@ namespace Cosmogenesis.Core;
 
 public abstract class DbSerializerBase : CosmosSerializer
 {
+    static readonly byte[] TypeBytes = Encoding.UTF8.GetBytes(nameof(DbDoc.Type));
+    static readonly byte[] DocumentsBytes = Encoding.UTF8.GetBytes("Documents");
     static JsonSerializerOptions CreateJsonSerializerOptions(JsonIgnoreCondition defaultIgnoreCondition) => new()
     {
         DefaultIgnoreCondition = defaultIgnoreCondition,
@@ -63,17 +66,16 @@ public abstract class DbSerializerBase : CosmosSerializer
         var reader = new Utf8JsonReader(data);
         if (DeserializeDbDocCache<T>.IsDbDoc)
         {
-            while (reader.Read())
+            if (reader.Read() && reader.TokenType == JsonTokenType.StartObject)
             {
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
                 {
-                    if (reader.GetString() == nameof(DbDoc.Type))
+                    if (reader.ValueTextEquals(TypeBytes))
                     {
                         if (!reader.Read())
                         {
                             break;
                         }
-
                         var type = reader.GetString();
                         return (T)(object?)DeserializeByType(data, type)!;
                     }
@@ -105,7 +107,7 @@ public abstract class DbSerializerBase : CosmosSerializer
         {
             if (reader.TokenType == JsonTokenType.PropertyName)
             {
-                if (reader.GetString() == "Documents")
+                if (reader.ValueTextEquals(DocumentsBytes))
                 {
                     reader.Read();
                     if (reader.TokenType != JsonTokenType.StartArray)

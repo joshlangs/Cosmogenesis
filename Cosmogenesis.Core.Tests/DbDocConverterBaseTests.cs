@@ -43,7 +43,7 @@ public class DbDocConverterBaseTests : DbDocConverterBase
 
     new string? Type;
     JsonSerializerOptions? Options;
-    protected override DbDoc DeserializeByType(ReadOnlySpan<byte> data, string? type, JsonSerializerOptions options)
+    protected override DbDoc DeserializeByType(ref Utf8JsonReader reader, string? type, JsonSerializerOptions options)
     {
         Type = type;
         Options = options;

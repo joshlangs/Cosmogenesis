@@ -1,28 +1,32 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Cosmogenesis.Core;
 
 public abstract class DbDocConverterBase : JsonConverter<DbDoc>
 {
+    static readonly byte[] TypeBytes = Encoding.UTF8.GetBytes(nameof(DbDoc.Type));
     public sealed override DbDoc Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var start = reader.TokenStartIndex;
-        using var doc = JsonDocument.ParseValue(ref reader);
-        if (!doc.RootElement.TryGetProperty(nameof(DbDoc.Type), out var value))
+        var clone = reader;
+        if (clone.Read() && clone.TokenType == JsonTokenType.StartObject)
         {
-            throw new NotSupportedException($"We don't understand how to deserialize this message");
+            while (clone.Read() && clone.TokenType == JsonTokenType.PropertyName)
+            {
+                if (clone.ValueTextEquals(TypeBytes))
+                {
+                    clone.Read();
+                    var type = clone.GetString();
+                    return DeserializeByType(ref reader, type, options) ?? throw new NotSupportedException($"We cannot deserialize {type} into null");
+                }
+                reader.Skip();
+            }
         }
-        var end = reader.BytesConsumed;        
-        using var ms = new MemoryStream((int)(end - start + 1));
-        using var writer = new Utf8JsonWriter(ms);
-        doc.WriteTo(writer);
-        writer.Flush();
-        var type = value.GetString();
-        return DeserializeByType(ms.GetDataSpan(), type, options) ?? throw new NotSupportedException($"We cannot deserialize {type} into null");
+        throw new NotSupportedException($"We don't understand how to deserialize this message");
     }
 
-    protected abstract DbDoc? DeserializeByType(ReadOnlySpan<byte> data, string? type, JsonSerializerOptions options);
+    protected abstract DbDoc? DeserializeByType(ref Utf8JsonReader reader, string? type, JsonSerializerOptions options);
 
     public override sealed void Write(Utf8JsonWriter writer, DbDoc value, JsonSerializerOptions options) => throw new NotImplementedException();
 }

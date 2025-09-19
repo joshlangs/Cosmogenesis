@@ -20,7 +20,7 @@ public class {databasePlan.ConverterClassName} : Cosmogenesis.Core.DbDocConverte
     public static readonly {databasePlan.Namespace}.{databasePlan.ConverterClassName} Instance = new();
 
     protected override Cosmogenesis.Core.DbDoc? DeserializeByType(
-        System.ReadOnlySpan<byte> data, 
+        ref System.Text.Json.Utf8JsonReader reader, 
         string? type, 
         System.Text.Json.JsonSerializerOptions options) => type switch
         {{
@@ -33,5 +33,5 @@ public class {databasePlan.ConverterClassName} : Cosmogenesis.Core.DbDocConverte
         outputModel.Context.AddSource($"db_{databasePlan.ConverterClassName}.cs", s);
     }
     static string DeserializeType(DocumentPlan documentPlan) => $@"
-            {documentPlan.ConstDocType} => System.Text.Json.JsonSerializer.Deserialize<{documentPlan.FullTypeName}>(utf8Json: data, options: options),";
+            {documentPlan.ConstDocType} => System.Text.Json.JsonSerializer.Deserialize<{documentPlan.FullTypeName}>(reader: ref reader, options: options),";
 }
