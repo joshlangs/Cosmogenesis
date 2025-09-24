@@ -17,6 +17,6 @@ class OutputModel
     public INamedTypeSymbol UseDefaultAttributeSymbol = default!;
     public INamedTypeSymbol DbDocSymbol = default!;
     public INamedTypeSymbol? JsonIgnoreAttributeSymbol = default!;
-    public readonly List<ClassModel> Classes = new();
-    public readonly List<DbAttributeModel> DbAttributes = new();
+    public readonly List<ClassModel> Classes = [];
+    public readonly List<DbAttributeModel> DbAttributes = [];
 }

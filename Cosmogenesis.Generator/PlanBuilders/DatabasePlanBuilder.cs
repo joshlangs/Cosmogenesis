@@ -19,7 +19,7 @@ static class DatabasePlanBuilder
         }
         foreach (var classModel in outputModel.Classes)
         {
-            outputPlan.DatabasePlansByClass[classModel] = new();
+            outputPlan.DatabasePlansByClass[classModel] = [];
             foreach (var dbAttribute in classModel.DbAttributes)
             {
                 Initialize(outputModel, classModel, outputPlan, dbAttribute);

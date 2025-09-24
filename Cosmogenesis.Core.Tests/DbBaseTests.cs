@@ -6,11 +6,8 @@ namespace Cosmogenesis.Core.Tests;
 
 public class DbBaseTests
 {
-    class TestDb : DbBase
+    class TestDb(Container container, DbSerializerBase serializer, bool isReadOnly, bool validateStateBeforeSave) : DbBase(container, serializer, isReadOnly, validateStateBeforeSave)
     {
-        public TestDb(Container container, DbSerializerBase serializer, bool isReadOnly, bool validateStateBeforeSave) : base(container, serializer, isReadOnly, validateStateBeforeSave)
-        {
-        }
         public new Task<T?> ReadByIdAsync<T>(string id, PartitionKey partitionKey, string type) where T : DbDoc => base.ReadByIdAsync<T>(id, partitionKey, type);
         public new Task<T?[]> ReadByIdsAsync<T>(IEnumerable<string> ids, PartitionKey partitionKey, string type) where T : DbDoc => base.ReadByIdsAsync<T>(ids, partitionKey, type);
         public new Task<DbDoc?> ReadByIdAsync(string id, PartitionKey partitionKey) => base.ReadByIdAsync(id, partitionKey);
@@ -21,11 +18,8 @@ public class DbBaseTests
         public new Task<DbConflictType?> DeleteItemAsync<T>(T item, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc => base.DeleteItemAsync(item, partitionKey, partitionKeyString);
         protected override void ValidateContainerDefaultTtl(int? ttl) { }
     }
-    public class ReadByIdsAsyncDb : DbBase
+    public class ReadByIdsAsyncDb(Container container, DbSerializerBase serializer, bool isReadOnly, bool validateStateBeforeSave) : DbBase(container, serializer, isReadOnly, validateStateBeforeSave)
     {
-        public ReadByIdsAsyncDb(Container container, DbSerializerBase serializer, bool isReadOnly, bool validateStateBeforeSave) : base(container, serializer, isReadOnly, validateStateBeforeSave)
-        {
-        }
         public new Task<T?[]> ReadByIdsAsync<T>(IEnumerable<string> ids, PartitionKey partitionKey, string type) where T : DbDoc => base.ReadByIdsAsync<T>(ids, partitionKey, type);
 #pragma warning disable CS8609 // Nullability of reference types in return type doesn't match overridden member.
         protected sealed override Task<DbDoc?> ReadByIdAsync(string id, PartitionKey partitionKey) => MockReadByIdAsync(id, partitionKey);
@@ -90,11 +84,11 @@ public class DbBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReadByIdsAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReadByIdsAsync<TestDoc>(new[] { "id" }, PartitionKey, null!));
+    public async Task ReadByIdsAsync_NullType_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReadByIdsAsync<TestDoc>(["id"], PartitionKey, null!));
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ReadByIdsAsync_NullId_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReadByIdsAsync<TestDoc>(new[] { "id", null! }, PartitionKey, Type));
+    public async Task ReadByIdsAsync_NullId_Throws() => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateDb().ReadByIdsAsync<TestDoc>(["id", null!], PartitionKey, Type));
 
 
     [Fact]
@@ -383,7 +377,7 @@ public class DbBaseTests
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
     public void ReadByIdsAsync_NoIds_ReturnsEmptySynchronously()
     {
-        var result = CreateDb().ReadByIdsAsync<TestDoc>(Array.Empty<string>(), PartitionKey, Type);
+        var result = CreateDb().ReadByIdsAsync<TestDoc>([], PartitionKey, Type);
 
         Assert.True(result.IsCompletedSuccessfully);
         Assert.Empty(result.Result);

@@ -5,11 +5,8 @@ namespace Cosmogenesis.Core.Tests;
 
 public class DbBatchBaseTests
 {
-    class TestBatch : DbBatchBase
+    class TestBatch(DbSerializerBase serializer, TransactionalBatch transactionalBatch, string partitionKey) : DbBatchBase(serializer, transactionalBatch, partitionKey, true)
     {
-        public TestBatch(DbSerializerBase serializer, TransactionalBatch transactionalBatch, string partitionKey) : base(serializer, transactionalBatch, partitionKey, true)
-        {
-        }
         public new void CreateCore<T>(T item, string type) where T : DbDoc => base.CreateCore(item, type);
         public new void DeleteCore<T>(T item) where T : DbDoc => base.DeleteCore(item);
         public new void ReplaceCore<T>(T item, string type) where T : DbDoc => base.ReplaceCore(item, type);

@@ -14,7 +14,7 @@ class DocumentPlan
     public bool IsTransient;
     public bool AutoExpires;
     public int? DefaultTtl;
-    public readonly Dictionary<string, PropertyPlan> PropertiesByName = new();
-    public readonly Dictionary<string, PropertyPlan> PropertiesByArgumentName = new();
+    public readonly Dictionary<string, PropertyPlan> PropertiesByName = [];
+    public readonly Dictionary<string, PropertyPlan> PropertiesByArgumentName = [];
     public string ConstDocType = default!;
 }

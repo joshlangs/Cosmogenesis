@@ -5,11 +5,8 @@ namespace Cosmogenesis.Core.Tests;
 
 public class DbQueryBuilderBaseTests
 {
-    class TestQueryBuilder : DbQueryBuilderBase
+    class TestQueryBuilder(DbBase dbBase, PartitionKey? partitionKey) : DbQueryBuilderBase(dbBase, partitionKey)
     {
-        public TestQueryBuilder(DbBase dbBase, PartitionKey? partitionKey) : base(dbBase, partitionKey)
-        {
-        }
         public new IQueryable<T> BuildQueryByType<T>(string type) where T : DbDoc => base.BuildQueryByType<T>(type);
         public new IQueryable<T> BuildQueryByTypes<T>(string[] types) where T : DbDoc => base.BuildQueryByTypes<T>(types);
     }
@@ -22,7 +19,7 @@ public class DbQueryBuilderBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public void Ctor_NullPartitionKey_DoesNotThrow() => new TestQueryBuilder(MockDb.Object, null);
+    public void Ctor_NullPartitionKey_DoesNotThrow() => _ = new TestQueryBuilder(MockDb.Object, null);
 
     [Fact]
     [Trait("Type", "Unit")]
@@ -39,7 +36,7 @@ public class DbQueryBuilderBaseTests
         var items = new List<TestDoc>
         {
             TestDoc.Instance,
-            new TestDoc { Type = "asdf" },
+            new() { Type = "asdf" },
             TestDoc.Instance
         };
         var q = items.AsQueryable().OrderBy(x => true);
@@ -66,7 +63,7 @@ public class DbQueryBuilderBaseTests
         var items = new List<TestDoc>
         {
             TestDoc.Instance,
-            new TestDoc { Type = "asdf" },
+            new() { Type = "asdf" },
             TestDoc.Instance
         };
         var q = items.AsQueryable().OrderBy(x => true);
@@ -93,7 +90,7 @@ public class DbQueryBuilderBaseTests
         var items = new List<TestDoc>
         {
             TestDoc.Instance,
-            new TestDoc { Type = "asdf" },
+            new() { Type = "asdf" },
             TestDoc.Instance
         };
         var q = items.AsQueryable().OrderBy(x => true);
@@ -121,7 +118,7 @@ public class DbQueryBuilderBaseTests
         var items = new List<TestDoc>
         {
             TestDoc.Instance,
-            new TestDoc { Type = "asdf" },
+            new() { Type = "asdf" },
             TestDoc.Instance
         };
         var q = items.AsQueryable().OrderBy(x => true);

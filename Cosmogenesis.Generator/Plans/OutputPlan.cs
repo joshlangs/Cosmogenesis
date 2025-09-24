@@ -3,6 +3,6 @@
 namespace Cosmogenesis.Generator.Plans;
 class OutputPlan
 {
-    public readonly Dictionary<string, DatabasePlan> DatabasePlansByName = new();
-    public readonly Dictionary<ClassModel, List<DatabasePlan>> DatabasePlansByClass = new();
+    public readonly Dictionary<string, DatabasePlan> DatabasePlansByName = [];
+    public readonly Dictionary<ClassModel, List<DatabasePlan>> DatabasePlansByClass = [];
 }

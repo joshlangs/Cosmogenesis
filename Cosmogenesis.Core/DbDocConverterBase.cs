@@ -20,7 +20,7 @@ public abstract class DbDocConverterBase : JsonConverter<DbDoc>
                     var type = clone.GetString();
                     return DeserializeByType(ref reader, type, options) ?? throw new NotSupportedException($"We cannot deserialize {type} into null");
                 }
-                reader.Skip();
+                clone.Skip();
             }
         }
         throw new NotSupportedException($"We don't understand how to deserialize this message");

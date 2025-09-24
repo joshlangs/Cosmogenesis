@@ -5,12 +5,8 @@ namespace Cosmogenesis.Core.Tests;
 public class BatchProcessorTests
 {
 #pragma warning disable IDE0060 // Remove unused parameter
-    public class TestChangeFeed : BatchProcessor
+    public class TestChangeFeed(BatchHandlersBase batchHandlers) : BatchProcessor(batchHandlers)
     {
-        public TestChangeFeed(BatchHandlersBase batchHandlers) : base(batchHandlers)
-        {
-        }
-
         public sealed override Task HandleAsync(IReadOnlyCollection<DbDoc> changes, CancellationToken cancellationToken) => MockHandleAsync(changes, cancellationToken);
         protected sealed override Task HandleAllAtOnce(IReadOnlyCollection<DbDoc> changes, CancellationToken cancellationToken) => MockHandleAllAtOnce(changes, cancellationToken);
         protected sealed override Task HandleSequential(IEnumerable<DbDoc> changes, CancellationToken cancellationToken) => MockHandleSequential(changes, cancellationToken);
@@ -33,7 +29,7 @@ public class BatchProcessorTests
     {
         var feed = new Mock<TestChangeFeed>(MockBehavior.Strict, new FeedHandlers(Cancel, Cancel));
         feed.Setup(x => x.MockHandleAsync(Array.Empty<DbDoc>(), It.IsAny<CancellationToken>())).CallBase();
-        var result = feed.Object.MockHandleAsync(Array.Empty<DbDoc>(), default);
+        var result = feed.Object.MockHandleAsync([], default);
 
         Assert.True(result.IsCompletedSuccessfully);
     }
@@ -222,7 +218,7 @@ public class BatchProcessorTests
                     }
                     else
                     {
-                        previousTasksByPk[doc.pk] = new List<Task> { prev };
+                        previousTasksByPk[doc.pk] = [prev];
                     }
                     return prev;
                 }
