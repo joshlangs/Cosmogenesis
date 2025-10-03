@@ -10,9 +10,9 @@ public abstract class DbDocConverterBase : JsonConverter<DbDoc>
     public sealed override DbDoc Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var clone = reader;
-        if (clone.Read() && clone.TokenType == JsonTokenType.StartObject)
+        while (clone.Read())
         {
-            while (clone.Read() && clone.TokenType == JsonTokenType.PropertyName)
+            if (clone.TokenType == JsonTokenType.PropertyName)
             {
                 if (clone.ValueTextEquals(TypeBytes))
                 {
