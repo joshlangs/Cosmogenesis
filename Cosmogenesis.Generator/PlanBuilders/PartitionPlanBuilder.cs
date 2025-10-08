@@ -121,6 +121,7 @@ static class PartitionPlanBuilder
                 CreateClassName = name.WithSuffix(Suffixes.Create),
                 CreateWithoutResultClassName = name.WithSuffix(Suffixes.CreateWithoutResult),
                 BatchClassName = name.WithSuffix(Suffixes.Batch),
+                BatchWithResultsClassName = name.WithSuffix(Suffixes.BatchWithResults),
                 GetPkModel = methodModel
             };
             partitionPlan.BatchHandlersClassNameArgument = partitionPlan.BatchHandlersClassName.ToArgumentName();

@@ -13,6 +13,7 @@ static class Suffixes
     public const string Query = "Query";
     public const string QueryUnions = "QueryUnions";
     public const string Batch = "Batch";
+    public const string BatchWithResults = "BatchWithResults";
     public const string Read = "Read";
     public const string ReadMany = "ReadMany";
     public const string ReadOrThrow = "ReadOrThrow";

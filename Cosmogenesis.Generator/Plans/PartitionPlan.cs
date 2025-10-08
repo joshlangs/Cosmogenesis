@@ -30,4 +30,5 @@ class PartitionPlan
     public string CreateClassName = default!;
     public string CreateWithoutResultClassName = default!;
     public string BatchClassName = default!;
+    public string BatchWithResultsClassName = default!;
 }

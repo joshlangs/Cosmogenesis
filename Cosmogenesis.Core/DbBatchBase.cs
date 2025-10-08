@@ -6,6 +6,7 @@ namespace Cosmogenesis.Core;
 public abstract class DbBatchBase
 {
     public const int MaxBatchItems = 100;
+    static readonly TransactionalBatchItemRequestOptions OptionsWithoutContentResponse = new() { EnableContentResponseOnWrite = false };
 
     protected virtual DbSerializerBase Serializer { get; } = default!;
     protected virtual TransactionalBatch TransactionalBatch { get; } = default!;
@@ -18,6 +19,8 @@ public abstract class DbBatchBase
     public virtual bool IsEmpty { get; private set; } = true;
 
     public virtual bool ValidateStateBeforeSave { get; }
+    public virtual bool WithResults { get; }
+    readonly TransactionalBatchItemRequestOptions? Options;
 
     protected DbBatchBase() { }
 
@@ -25,7 +28,8 @@ public abstract class DbBatchBase
         DbSerializerBase serializer,
         TransactionalBatch transactionalBatch,
         string partitionKey,
-        bool validateStateBeforeSave)
+        bool validateStateBeforeSave,
+        bool withResults)
     {
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(transactionalBatch);
@@ -34,6 +38,8 @@ public abstract class DbBatchBase
         TransactionalBatch = transactionalBatch;
         PartitionKey = partitionKey;
         ValidateStateBeforeSave = validateStateBeforeSave;
+        WithResults = withResults;
+        Options = withResults ? null : OptionsWithoutContentResponse;
     }
 
     void ThrowIfExecuted()
@@ -123,16 +129,7 @@ public abstract class DbBatchBase
         }
     }
 
-    /// <summary>
-    /// Atomicly executes all operations in this batch.
-    /// Returns true if all operations succeeded.
-    /// Returns false if any operation failed (no changes made).
-    /// A batch can be submitted only once for execution.
-    /// </summary>
-    /// <exception cref="DbOverloadedException" />
-    /// <exception cref="DbUnknownStatusCodeException" />
-    /// <exception cref="InvalidOperationException" />
-    public virtual async Task<bool> ExecuteAsync()
+    protected virtual async Task<bool> ExecuteCoreAsync()
     {
         lock (LockObject)
         {
@@ -164,16 +161,7 @@ public abstract class DbBatchBase
         return false;
     }
 
-    /// <summary>
-    /// Atomicly executes all operations in this batch.
-    /// Throws an exception on failure.
-    /// A batch can be submitted only once for execution.
-    /// </summary>
-    /// <exception cref="DbOverloadedException" />
-    /// <exception cref="DbUnknownStatusCodeException" />
-    /// <exception cref="DbConflictException" />
-    /// <exception cref="InvalidOperationException" />
-    public virtual async Task ExecuteOrThrowAsync()
+    protected virtual async Task ExecuteOrThrowCoreAsync()
     {
         lock (LockObject)
         {
@@ -205,17 +193,12 @@ public abstract class DbBatchBase
         throw new DbConflictException(result.Conflict!.Value);
     }
 
-    /// <summary>
-    /// Atomicly executes all operations in this batch.
-    /// Returns true if all operations succeeded.
-    /// Returns false if any operation failed (no changes made).
-    /// A batch can be submitted only once for execution.
-    /// </summary>
-    /// <exception cref="DbOverloadedException" />
-    /// <exception cref="DbUnknownStatusCodeException" />
-    /// <exception cref="InvalidOperationException" />
-    public virtual async Task<BatchResult> ExecuteWithResultsAsync()
+    protected virtual async Task<BatchResult> ExecuteWithResultsCoreAsync()
     {
+        if (!WithResults)
+        {
+            throw new InvalidOperationException($"This batch does not support returning results");
+        }
         lock (LockObject)
         {
             ThrowIfExecuted();
@@ -277,7 +260,7 @@ public abstract class DbBatchBase
             ThrowIfFull();
             EnsureUniqueId(item);
             DeserializeResults.Add(Serializer.FromStream<T>);
-            TransactionalBatch.UpsertItemStream(streamPayload: Serializer.ToStream(item));
+            TransactionalBatch.UpsertItemStream(streamPayload: Serializer.ToStream(item), requestOptions: Options);
             IsEmpty = false;
         }
     }
@@ -303,7 +286,7 @@ public abstract class DbBatchBase
             ThrowIfFull();
             EnsureUniqueId(item);
             DeserializeResults.Add(Serializer.FromStream<T>);
-            TransactionalBatch.CreateItemStream(streamPayload: Serializer.ToStream(item));
+            TransactionalBatch.CreateItemStream(streamPayload: Serializer.ToStream(item), requestOptions: Options);
             IsEmpty = false;
         }
     }
@@ -330,7 +313,8 @@ public abstract class DbBatchBase
                 streamPayload: Serializer.ToStream(item),
                 requestOptions: new TransactionalBatchItemRequestOptions
                 {
-                    IfMatchEtag = item._etag
+                    IfMatchEtag = item._etag,
+                    EnableContentResponseOnWrite = WithResults
                 });
             IsEmpty = false;
         }
@@ -351,7 +335,8 @@ public abstract class DbBatchBase
                 id: item.id,
                 requestOptions: new TransactionalBatchItemRequestOptions
                 {
-                    IfMatchEtag = item._etag
+                    IfMatchEtag = item._etag,
+                    EnableContentResponseOnWrite = false
                 });
             IsEmpty = false;
         }

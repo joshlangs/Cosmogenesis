@@ -47,9 +47,18 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
         {partitionPlan.QueryBuilderClassNameArgument}: this.QueryBuilder);
 
     /// <summary>
-    /// A batch of operations to be executed atomically (or not at all) within a {partitionPlan.Name} in the {databasePlan.Name} database.
+    /// A batch of operations to be executed atomically (or not at all) within a {partitionPlan.Name} in the {databasePlan.Name} database, without the need to retrieve any saved documents.
     /// </summary>
     public virtual {databasePlan.Namespace}.{partitionPlan.BatchClassName} CreateBatch() => new(
+        transactionalBatch: this.CreateBatchForPartition(),
+        partitionKey: this.PartitionKeyString,
+        validateStateBeforeSave: this.{databasePlan.DbClassName}.ValidateStateBeforeSave,
+        {partitionPlan.ClassNameArgument}: this);
+
+    /// <summary>
+    /// A batch of operations to be executed atomically (or not at all) within a {partitionPlan.Name} in the {databasePlan.Name} database.
+    /// </summary>
+    public virtual {databasePlan.Namespace}.{partitionPlan.BatchWithResultsClassName} CreateBatchWithResults() => new(
         transactionalBatch: this.CreateBatchForPartition(),
         partitionKey: this.PartitionKeyString,
         validateStateBeforeSave: this.{databasePlan.DbClassName}.ValidateStateBeforeSave,

@@ -5,12 +5,15 @@ namespace Cosmogenesis.Core.Tests;
 
 public class DbBatchBaseTests
 {
-    class TestBatch(DbSerializerBase serializer, TransactionalBatch transactionalBatch, string partitionKey) : DbBatchBase(serializer, transactionalBatch, partitionKey, true)
+    class TestBatch(DbSerializerBase serializer, TransactionalBatch transactionalBatch, string partitionKey) : DbBatchBase(serializer, transactionalBatch, partitionKey, true, true)
     {
         public new void CreateCore<T>(T item, string type) where T : DbDoc => base.CreateCore(item, type);
         public new void DeleteCore<T>(T item) where T : DbDoc => base.DeleteCore(item);
         public new void ReplaceCore<T>(T item, string type) where T : DbDoc => base.ReplaceCore(item, type);
         public new void CreateOrReplaceCore<T>(T item, string type) where T : DbDoc => base.CreateOrReplaceCore(item, type);
+        public new Task<bool> ExecuteCoreAsync() => base.ExecuteCoreAsync();
+        public new Task ExecuteOrThrowCoreAsync() => base.ExecuteOrThrowCoreAsync();
+        public new Task<BatchResult> ExecuteWithResultsCoreAsync() => base.ExecuteWithResultsCoreAsync();
     }
 
     readonly Mock<TransactionalBatch> MockBatch = new(MockBehavior.Strict);
@@ -52,11 +55,11 @@ public class DbBatchBaseTests
     [Fact]
     [Trait("Type", "Unit")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
-    public void ExecuteAsync_Empty_ReturnsCompletedSynchronously()
+    public void ExecuteCoreAsync_Empty_ReturnsCompletedSynchronously()
     {
         var batch = CreateTestBatch();
 
-        var result = batch.ExecuteAsync();
+        var result = batch.ExecuteCoreAsync();
 
         Assert.True(result.IsCompletedSuccessfully);
         Assert.True(result.Result);
@@ -64,43 +67,43 @@ public class DbBatchBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ExecuteAsync_Twice_Throws()
+    public async Task ExecuteCoreAsync_Twice_Throws()
     {
         var batch = CreateTestBatch();
 
-        await batch.ExecuteAsync();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteAsync());
+        await batch.ExecuteCoreAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteCoreAsync());
     }
 
     [Fact]
     [Trait("Type", "Unit")]
-    public void ExecuteOrThrowAsync_Empty_ReturnsCompletedSynchronously()
+    public void ExecuteOrThrowCoreAsync_Empty_ReturnsCompletedSynchronously()
     {
         var batch = CreateTestBatch();
 
-        var result = batch.ExecuteOrThrowAsync();
+        var result = batch.ExecuteOrThrowCoreAsync();
 
         Assert.True(result.IsCompletedSuccessfully);
     }
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ExecuteOrThrowAsync_Twice_Throws()
+    public async Task ExecuteOrThrowCoreAsync_Twice_Throws()
     {
         var batch = CreateTestBatch();
 
-        await batch.ExecuteOrThrowAsync();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteOrThrowAsync());
+        await batch.ExecuteOrThrowCoreAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteOrThrowCoreAsync());
     }
 
     [Fact]
     [Trait("Type", "Unit")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "<Pending>")]
-    public void ExecuteWithResultsAsync_Empty_ReturnsCompletedSynchronously()
+    public void ExecuteWithResultsCoreAsync_Empty_ReturnsCompletedSynchronously()
     {
         var batch = CreateTestBatch();
 
-        var result = batch.ExecuteWithResultsAsync();
+        var result = batch.ExecuteWithResultsCoreAsync();
 
         Assert.True(result.IsCompletedSuccessfully);
         Assert.Null(result.Result.Conflict);
@@ -109,12 +112,12 @@ public class DbBatchBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ExecuteWithResultsAsync_Twice_Throws()
+    public async Task ExecuteWithResultsCoreAsync_Twice_Throws()
     {
         var batch = CreateTestBatch();
 
-        await batch.ExecuteWithResultsAsync();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteWithResultsAsync());
+        await batch.ExecuteWithResultsCoreAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => batch.ExecuteWithResultsCoreAsync());
     }
 
     [Fact]
@@ -186,7 +189,7 @@ public class DbBatchBaseTests
     public async Task DeleteCore_AfterExecute_Throws()
     {
         var batch = CreateTestBatch();
-        await batch.ExecuteAsync();
+        await batch.ExecuteCoreAsync();
         Assert.Throws<InvalidOperationException>(() => batch.DeleteCore(TestDocWithETag));
     }
 
@@ -276,7 +279,7 @@ public class DbBatchBaseTests
     public async Task ReplaceCore_AfterExecute_Throws()
     {
         var batch = CreateTestBatch();
-        await batch.ExecuteAsync();
+        await batch.ExecuteCoreAsync();
         Assert.Throws<InvalidOperationException>(() => batch.ReplaceCore(TestDocWithETag, TestDocWithETag.Type));
     }
 
@@ -334,7 +337,7 @@ public class DbBatchBaseTests
     public async Task CreateCore_AfterExecute_Throws()
     {
         var batch = CreateTestBatch();
-        await batch.ExecuteAsync();
+        await batch.ExecuteCoreAsync();
         Assert.Throws<InvalidOperationException>(() => batch.CreateCore(TestDocWithoutETag, TestDocWithoutETag.Type));
     }
 
@@ -438,7 +441,7 @@ public class DbBatchBaseTests
     public async Task CreateOrReplaceCore_AfterExecute_Throws()
     {
         var batch = CreateTestBatch();
-        await batch.ExecuteAsync();
+        await batch.ExecuteCoreAsync();
         Assert.Throws<InvalidOperationException>(() => batch.CreateOrReplaceCore(TestDocWithoutETag, TestDocWithoutETag.Type));
     }
 
@@ -492,7 +495,7 @@ public class DbBatchBaseTests
 
     [Fact]
     [Trait("Type", "Unit")]
-    public async Task ExecuteAsync_BatchSuccess_ReturnsTrue()
+    public async Task ExecuteCoreAsync_BatchSuccess_ReturnsTrue()
     {
         var mockResponse = new Mock<TransactionalBatchResponse>();
         mockResponse.Setup(x => x.IsSuccessStatusCode).Returns(true).Verifiable();
@@ -507,7 +510,7 @@ public class DbBatchBaseTests
 
         var batch = CreateTestBatch();
         batch.CreateCore(TestDocWithoutETag, TestDocWithoutETag.Type);
-        var result = await batch.ExecuteAsync();
+        var result = await batch.ExecuteCoreAsync();
 
         Assert.True(result);
         mockResponse.Verify();
