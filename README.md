@@ -161,7 +161,7 @@ await db
     .Replace(accountInfo)
     .ExecuteOrThrowAsync(); // Explode if the batch fails
 // The accountInfo variable is now "stale" and must be reloaded if more operations on it are needed
-// To avoid this, we could have used ExecuteWithResultsAsync to get the new version of accountInfo
+// To avoid this, we could have used CreateBatchWithResults to get the new version of accountInfo
 
             
 // Load any "Mobile" phone number for this account
