@@ -8,6 +8,8 @@ namespace Cosmogenesis.Core;
 
 public abstract class DbBase
 {
+    static readonly ItemRequestOptions OptionsWithoutContentResponse = new() { EnableContentResponseOnWrite = false };
+
     internal const int ReadIdsQueryThreshhold = 4;
     internal const int MaxIdsPerQuery = 10000;
     internal const int MaxIdLengthPerQuery = 500000;
@@ -194,7 +196,7 @@ public abstract class DbBase
         return results;
     }
 
-    internal protected virtual async Task<CreateResult<T>> CreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
+    void PrepareCreateItem<T>(T item, string type, string partitionKeyString) where T : DbDoc
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(type);
@@ -238,7 +240,25 @@ public abstract class DbBase
         {
             item.ValidateStateOrThrow();
         }
+    }
+    internal protected virtual async Task<DbConflictType?> CreateItemWithoutResultAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
+    {
+        PrepareCreateItem(item, type, partitionKeyString);
+        using var payload = Serializer.ToStream(item);
+        using var result = await Container.CreateItemStreamAsync(
+            streamPayload: payload,
+            partitionKey: partitionKey,
+            requestOptions: OptionsWithoutContentResponse).ConfigureAwait(false);
+        if (result.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        return result.CreateConflictTypeFromErrorStatus();
 
+    }
+    internal protected virtual async Task<CreateResult<T>> CreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString) where T : DbDoc
+    {
+        PrepareCreateItem(item, type, partitionKeyString);
         using var payload = Serializer.ToStream(item);
         using var result = await Container.CreateItemStreamAsync(
             streamPayload: payload,
@@ -255,55 +275,23 @@ public abstract class DbBase
         return result.CreateResultFromErrorStatus<T>();
     }
 
+    internal protected virtual async Task CreateOrReplaceItemWithoutResultAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
+    {
+        PrepareCreateItem(item, type, partitionKeyString);
+        using var payload = Serializer.ToStream(item);
+        using var result = await Container.UpsertItemStreamAsync(
+            streamPayload: payload,
+            partitionKey: partitionKey,
+            requestOptions: OptionsWithoutContentResponse).ConfigureAwait(false);
+        if (result.IsSuccessStatusCode)
+        {
+            return;
+        }
+        throw result.ExceptionFromErrorStatus();
+    }
     internal protected virtual async Task<CreateOrReplaceResult<T>> CreateOrReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
-        ArgumentNullException.ThrowIfNull(item);
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(partitionKeyString);
-
-        ThrowIfReadOnly();
-
-        if (item.id is null)
-        {
-            throw new InvalidOperationException("The document .id property is missing");
-        }
-        if (item._etag is not null)
-        {
-            throw new InvalidOperationException("The document already has an etag");
-        }
-        if (item.pk is null)
-        {
-            item.pk = partitionKeyString;
-        }
-        else if (item.pk != partitionKeyString)
-        {
-            throw new InvalidOperationException("The document .pk property does not match this partition key");
-        }
-        if (item.Type is null)
-        {
-            item.Type = type;
-        }
-        else if (item.Type != type)
-        {
-            throw new InvalidOperationException($"The document .Type property does not match what was expected ({type})");
-        }
-        if (item.ttl.HasValue && !allowTtl)
-        {
-            throw new InvalidOperationException($"The document .ttl property must be null");
-        }
-        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
-        {
-            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
-        }
-
-        Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
-        item.CreationDate = DateTime.UtcNow;
-
-        if (ValidateStateBeforeSave)
-        {
-            item.ValidateStateOrThrow();
-        }
-
+        PrepareCreateItem(item, type, partitionKeyString);
         using var payload = Serializer.ToStream(item);
         using var result = await Container.UpsertItemStreamAsync(
             streamPayload: payload,
@@ -325,49 +313,7 @@ public abstract class DbBase
 
     internal protected virtual async Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool tryCreateFirst) where T : DbDoc
     {
-        ArgumentNullException.ThrowIfNull(item);
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(partitionKeyString);
-
-        ThrowIfReadOnly();
-
-        if (item.id is null)
-        {
-            throw new InvalidOperationException("The document .id property is missing");
-        }
-        if (item._etag is not null)
-        {
-            throw new InvalidOperationException("The document already has an etag");
-        }
-        if (item.pk is null)
-        {
-            item.pk = partitionKeyString;
-        }
-        else if (item.pk != partitionKeyString)
-        {
-            throw new InvalidOperationException("The document .pk property does not match this partition key");
-        }
-        if (item.Type is null)
-        {
-            item.Type = type;
-        }
-        else if (item.Type != type)
-        {
-            throw new InvalidOperationException($"The document .type property does not match what was expected ({type})");
-        }
-        if (item.ttl.HasValue && (item.ttl.Value < -1 || item.ttl.Value == 0))
-        {
-            throw new InvalidOperationException($"The document .ttl property must be either -1 or greater than 0, if provided");
-        }
-
-        Debug.Assert(item.CreationDate == IsoDateCheater.MinValue, "Don't set CreationDate. It is overridden anyway.");
-        item.CreationDate = DateTime.UtcNow;
-
-        if (ValidateStateBeforeSave)
-        {
-            item.ValidateStateOrThrow();
-        }
-
+        PrepareCreateItem(item, type, partitionKeyString);
         const int ConcurrencyRetryCount = 10;
         for (var x = 0; x < ConcurrencyRetryCount; ++x)
         {
@@ -413,7 +359,7 @@ public abstract class DbBase
         throw new DbOverloadedException(); // Should never get here
     }
 
-    internal protected virtual async Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
+    void PrepareReplaceItem<T>(T item, string type, string partitionKeyString, bool allowTtl) where T : DbDoc
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(type);
@@ -450,6 +396,26 @@ public abstract class DbBase
         {
             item.ValidateStateOrThrow();
         }
+    }
+    internal protected virtual async Task<DbConflictType?> ReplaceItemWithoutResultAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
+    {
+        PrepareReplaceItem(item, type, partitionKeyString, allowTtl);
+
+        using var payload = Serializer.ToStream(item);
+        using var result = await Container.ReplaceItemStreamAsync(
+            streamPayload: payload,
+            id: item.id,
+            partitionKey: partitionKey,
+            requestOptions: new ItemRequestOptions { IfMatchEtag = item._etag, EnableContentResponseOnWrite = false }).ConfigureAwait(false);
+        if (result.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        return result.ReplaceConflictTypeFromErrorStatus();
+    }
+    internal protected virtual async Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, PartitionKey partitionKey, string partitionKeyString, bool allowTtl) where T : DbDoc
+    {
+        PrepareReplaceItem(item, type, partitionKeyString, allowTtl);
 
         using var payload = Serializer.ToStream(item);
         using var result = await Container.ReplaceItemStreamAsync(

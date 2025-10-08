@@ -20,6 +20,11 @@ static class ResponseExtensions
         HttpStatusCode.Conflict => CreateResult<T>.AlreadyExists,
         _ => throw ExceptionFromErrorStatus(statusCode)
     };
+    public static DbConflictType CreateConflictTypeFromErrorStatus(this ResponseMessage responseMessage) => responseMessage.StatusCode switch
+    {
+        HttpStatusCode.Conflict => DbConflictType.AlreadyExists,
+        _ => throw ExceptionFromErrorStatus(responseMessage.StatusCode)
+    };
 
     public static ReplaceResult<T> ReplaceResultFromErrorStatus<T>(this ResponseMessage responseMessage) where T : DbDoc => ReplaceResultFromErrorStatus<T>(responseMessage.StatusCode);
     public static ReplaceResult<T> ReplaceResultFromErrorStatus<T>(this HttpStatusCode statusCode) where T : DbDoc => statusCode switch
@@ -27,6 +32,12 @@ static class ResponseExtensions
         HttpStatusCode.PreconditionFailed => ReplaceResult<T>.ETagChanged,
         HttpStatusCode.NotFound => ReplaceResult<T>.Missing,
         _ => throw ExceptionFromErrorStatus(statusCode)
+    };
+    public static DbConflictType ReplaceConflictTypeFromErrorStatus(this ResponseMessage responseMessage) => responseMessage.StatusCode switch
+    {
+        HttpStatusCode.PreconditionFailed => DbConflictType.ETagChanged,
+        HttpStatusCode.NotFound => DbConflictType.Missing,
+        _ => throw ExceptionFromErrorStatus(responseMessage.StatusCode)
     };
 
     public static DbConflictType DeleteConflictTypeFromErrorStatus(this ResponseMessage responseMessage) => DeleteConflictTypeFromErrorStatus(responseMessage.StatusCode);
@@ -49,7 +60,7 @@ static class ResponseExtensions
     public static Exception ExceptionFromErrorStatus(this ResponseMessage responseMessage) => ExceptionFromErrorStatus(responseMessage.StatusCode);
     public static Exception ExceptionFromErrorStatus(this HttpStatusCode statusCode) => statusCode switch
     {
-        (HttpStatusCode)429 => new DbOverloadedException(),
+        HttpStatusCode.TooManyRequests => new DbOverloadedException(),
         HttpStatusCode.RequestEntityTooLarge => new DbRequestTooLargeException(),
         _ => new DbUnknownStatusCodeException(statusCode)
     };

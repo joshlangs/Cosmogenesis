@@ -301,10 +301,6 @@ Cosmogenesis uses the built-in `[JsonStringEnumConverter]` converter with defaul
 
 IPAddress instances will be converted to and from string.
 
-### Collections
-
-Collections like List<T>, etc, are supported (by `MagicConverter`) - https://github.com/dotnet/corefx/issues/39477
-
 ### Custom
 
 [JsonConverter] can be used as well.

@@ -36,6 +36,13 @@ public abstract class DbPartitionBase
             partitionKey: PartitionKey,
             partitionKeyString: PartitionKeyString);
 
+    protected Task<DbConflictType?> CreateItemWithoutResultAsync<T>(T item, string type) where T : DbDoc =>
+        DB.CreateItemWithoutResultAsync(
+            item: item,
+            type: type,
+            partitionKey: PartitionKey,
+            partitionKeyString: PartitionKeyString);
+
     protected Task<ReadOrCreateResult<T>> ReadOrCreateItemAsync<T>(T item, string type, bool tryCreateFirst) where T : DbDoc =>
         DB.ReadOrCreateItemAsync(
             item: item,
@@ -52,8 +59,24 @@ public abstract class DbPartitionBase
             partitionKeyString: PartitionKeyString,
             allowTtl: allowTtl);
 
+    protected Task CreateOrReplaceItemWithoutResultAsync<T>(T item, string type, bool allowTtl) where T : DbDoc =>
+        DB.CreateOrReplaceItemWithoutResultAsync(
+            item: item,
+            type: type,
+            partitionKey: PartitionKey,
+            partitionKeyString: PartitionKeyString,
+            allowTtl: allowTtl);
+
     protected Task<ReplaceResult<T>> ReplaceItemAsync<T>(T item, string type, bool allowTtl) where T : DbDoc =>
         DB.ReplaceItemAsync(
+            item: item,
+            type: type,
+            partitionKey: PartitionKey,
+            partitionKeyString: PartitionKeyString,
+            allowTtl: allowTtl);
+
+    protected Task<DbConflictType?> ReplaceItemWithoutResultAsync<T>(T item, string type, bool allowTtl) where T : DbDoc =>
+        DB.ReplaceItemWithoutResultAsync(
             item: item,
             type: type,
             partitionKey: PartitionKey,
@@ -65,5 +88,4 @@ public abstract class DbPartitionBase
             item: item,
             partitionKey: PartitionKey,
             partitionKeyString: PartitionKeyString);
-
 }

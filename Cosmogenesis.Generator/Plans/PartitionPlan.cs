@@ -14,6 +14,7 @@ class PartitionPlan
     public string BatchHandlersClassName = default!;
     public string BatchHandlersClassNameArgument = default!;
     public string CreateOrReplaceClassName = default!;
+    public string CreateOrReplaceWithoutResultClassName = default!;
     public string ReadClassName = default!;
     public string ReadUnionsClassName = default!;
     public string ReadOrThrowClassName = default!;
@@ -27,5 +28,6 @@ class PartitionPlan
     public string QueryBuilderClassNameArgument = default!;
     public string ReadOrCreateClassName = default!;
     public string CreateClassName = default!;
+    public string CreateWithoutResultClassName = default!;
     public string BatchClassName = default!;
 }

@@ -29,7 +29,6 @@ class Program
             .AccountInfoAsync(name: "Bob", isEvil: true, minionCount: 4)
             .ThrowOnConflict();  // using Cosmogenesis.Core;
 
-
         // Update minion count and add two PhoneNumber documents, atomically in a batch
         ++accountInfo.MinionCount;
         await db

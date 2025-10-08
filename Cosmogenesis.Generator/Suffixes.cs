@@ -20,7 +20,9 @@ static class Suffixes
     public const string ReadManyUnions = "ReadManyUnions";
     public const string ReadOrThrowUnions = "ReadOrThrowUnions";
     public const string Create = "Create";
+    public const string CreateWithoutResult = "CreateWithoutResult";
     public const string CreateOrReplace = "CreateOrReplace";
+    public const string CreateOrReplaceWithoutResult = "CreateOrReplaceWithoutResult";
     public const string ReadOrCreate = "ReadOrCreate";
     public const string Converter = "Converter";
     public const string Types = "Types";

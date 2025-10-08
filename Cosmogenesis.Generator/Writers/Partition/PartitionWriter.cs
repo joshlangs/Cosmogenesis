@@ -77,6 +77,12 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     /// </summary>
     public virtual {databasePlan.Namespace}.{partitionPlan.CreateClassName} Create => this.create ??= new(this);
 
+    {databasePlan.Namespace}.{partitionPlan.CreateWithoutResultClassName}? createWithoutResult;
+    /// <summary>
+    /// Methods to create documents without the need to retrieve the saved document.
+    /// </summary>
+    public virtual {databasePlan.Namespace}.{partitionPlan.CreateWithoutResultClassName} CreateWithoutResult => this.createWithoutResult ??= new(this);
+
     {databasePlan.Namespace}.{partitionPlan.ReadOrCreateClassName}? readOrCreate;
     /// <summary>
     /// Methods to read documents, or create them if they did not yet exist.
@@ -85,10 +91,14 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
 
 {ReadMany(databasePlan, partitionPlan)}
 {CreateOrReplace(databasePlan, partitionPlan)}
+{CreateOrReplaceWithoutResult(databasePlan, partitionPlan)}
 {string.Concat(partitionPlan.Documents.Select(x => Create(partitionPlan, x)))}
+{string.Concat(partitionPlan.Documents.Select(x => CreateWithoutResult(partitionPlan, x)))}
 {string.Concat(partitionPlan.Documents.Select(x => CreateOrReplace(partitionPlan, x)))}
+{string.Concat(partitionPlan.Documents.Select(x => CreateOrReplaceWithoutResult(partitionPlan, x)))}
 {string.Concat(partitionPlan.Documents.Select(x => ReadOrCreate(partitionPlan, x)))}
 {string.Concat(partitionPlan.Documents.Select(ReplaceIfMutable))}
+{string.Concat(partitionPlan.Documents.Select(ReplaceWithoutResultIfMutable))}
 {string.Concat(partitionPlan.Documents.Select(DeleteIfTransient))}
 }}
 ";
@@ -97,8 +107,10 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
 
         BatchWriter.Write(outputModel, databasePlan, partitionPlan);
         CreateWriter.Write(outputModel, databasePlan, partitionPlan);
+        CreateWithoutResultWriter.Write(outputModel, databasePlan, partitionPlan);
         ReadOrCreateWriter.Write(outputModel, databasePlan, partitionPlan);
         CreateOrReplaceWriter.Write(outputModel, databasePlan, partitionPlan);
+        CreateOrReplaceWithoutResultWriter.Write(outputModel, databasePlan, partitionPlan);
         ReadWriter.Write(outputModel, databasePlan, partitionPlan);
         ReadOrThrowWriter.Write(outputModel, databasePlan, partitionPlan);
         ReadManyWriter.Write(outputModel, databasePlan, partitionPlan);
@@ -134,7 +146,7 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
         !partitionPlan.Documents.Any(x => x.GetIdPlan.Arguments.Count > 0)
         ? ""
         : $@"
-        {partitionPlan.ReadManyClassName}? readMany;
+    {databasePlan.Namespace}.{partitionPlan.ReadManyClassName}? readMany;
     /// <summary>
     /// Methods to read multiple documents at once, though not necessarily in a single operation.
     /// </summary>
@@ -147,11 +159,22 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
         !partitionPlan.Documents.Any(x => x.IsTransient || x.IsMutable)
         ? ""
         : $@"
-        {partitionPlan.CreateOrReplaceClassName}? createOrReplace;
+    {databasePlan.Namespace}.{partitionPlan.CreateOrReplaceClassName}? createOrReplace;
     /// <summary>
     /// Methods to create or replace (unconditionally overwrite) documents.
     /// </summary>
     public virtual {databasePlan.Namespace}.{partitionPlan.CreateOrReplaceClassName} CreateOrReplace => this.createOrReplace ??= new(this);
+";
+
+    static string CreateOrReplaceWithoutResult(DatabasePlan databasePlan, PartitionPlan partitionPlan) =>
+        !partitionPlan.Documents.Any(x => x.IsTransient || x.IsMutable)
+        ? ""
+        : $@"
+    {databasePlan.Namespace}.{partitionPlan.CreateOrReplaceWithoutResultClassName}? createOrReplaceWithoutResult;
+    /// <summary>
+    /// Methods to create or replace (unconditionally overwrite) documents without the need to retrieve the saved document.
+    /// </summary>
+    public virtual {databasePlan.Namespace}.{partitionPlan.CreateOrReplaceWithoutResultClassName} CreateOrReplaceWithoutResult => this.createOrReplaceWithoutResult ??= new(this);
 ";
 
     static string ReplaceIfMutable(DocumentPlan documentPlan) =>
@@ -167,6 +190,25 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     {{
         System.ArgumentNullException.ThrowIfNull({documentPlan.ClassNameArgument});
         return this.ReplaceItemAsync(
+            item: {documentPlan.ClassNameArgument},
+            type: {documentPlan.ConstDocType},
+            allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
+    }}
+";
+
+    static string ReplaceWithoutResultIfMutable(DocumentPlan documentPlan) =>
+        !documentPlan.IsMutable
+        ? ""
+        : $@"
+    /// <summary>
+    /// Try to replace an existing {documentPlan.ClassName} without the need to retrieve the saved document.
+    /// </summary>
+    /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
+    /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
+    public virtual System.Threading.Tasks.Task<Cosmogenesis.Core.DbConflictType?> ReplaceWithoutResultAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
+    {{
+        System.ArgumentNullException.ThrowIfNull({documentPlan.ClassNameArgument});
+        return this.ReplaceItemWithoutResultAsync(
             item: {documentPlan.ClassNameArgument},
             type: {documentPlan.ConstDocType},
             allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
@@ -204,6 +246,21 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     }}
 ";
 
+    static string CreateWithoutResult(PartitionPlan partitionPlan, DocumentPlan documentPlan) => $@"
+    /// <summary>
+    /// Try to create a {documentPlan.ClassName}.
+    /// .id must be set if there is no stable id generator defined
+    /// .pk, .CreationDate and .Type are set automatically
+    /// </summary>
+    /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
+    /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
+    internal protected virtual System.Threading.Tasks.Task<Cosmogenesis.Core.DbConflictType?> CreateWithoutResultAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
+    {{
+        {DocumentModelWriter.CreateAndCheckPkAndId(partitionPlan, documentPlan, documentPlan.ClassNameArgument)}
+        return this.CreateItemWithoutResultAsync(item: {documentPlan.ClassNameArgument}, type: {documentPlan.ConstDocType});
+    }}
+";
+
     static string CreateOrReplace(PartitionPlan partitionPlan, DocumentPlan documentPlan) =>
         !documentPlan.IsMutable && !documentPlan.IsTransient
         ? ""
@@ -219,6 +276,24 @@ public class {partitionPlan.ClassName} : Cosmogenesis.Core.DbPartitionBase
     {{
         {DocumentModelWriter.CreateAndCheckPkAndId(partitionPlan, documentPlan, documentPlan.ClassNameArgument)}
         return this.CreateOrReplaceItemAsync(item: {documentPlan.ClassNameArgument}, type: {documentPlan.ConstDocType}, allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
+    }}
+";
+
+    static string CreateOrReplaceWithoutResult(PartitionPlan partitionPlan, DocumentPlan documentPlan) =>
+        !documentPlan.IsMutable && !documentPlan.IsTransient
+        ? ""
+        : $@"
+    /// <summary>
+    /// Create or replace (unconditionally overwrite) a {documentPlan.ClassName}.
+    /// .id must be set if there is no stable id generator defined
+    /// .pk, .CreationDate and .Type are set automatically
+    /// </summary>
+    /// <exception cref=""Cosmogenesis.Core.DbOverloadedException"" />
+    /// <exception cref=""Cosmogenesis.Core.DbUnknownStatusCodeException"" />
+    internal protected virtual System.Threading.Tasks.Task CreateOrReplaceWithoutResultAsync({documentPlan.FullTypeName} {documentPlan.ClassNameArgument})
+    {{
+        {DocumentModelWriter.CreateAndCheckPkAndId(partitionPlan, documentPlan, documentPlan.ClassNameArgument)}
+        return this.CreateOrReplaceItemWithoutResultAsync(item: {documentPlan.ClassNameArgument}, type: {documentPlan.ConstDocType}, allowTtl: {(documentPlan.AutoExpires ? "true" : "false")});
     }}
 ";
 

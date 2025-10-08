@@ -106,6 +106,7 @@ static class PartitionPlanBuilder
                 ClassName = name.WithSuffix(Suffixes.Partition),
                 BatchHandlersClassName = name.WithSuffix(Suffixes.BatchHandlers),
                 CreateOrReplaceClassName = name.WithSuffix(Suffixes.CreateOrReplace),
+                CreateOrReplaceWithoutResultClassName = name.WithSuffix(Suffixes.CreateOrReplaceWithoutResult),
                 ReadClassName = name.WithSuffix(Suffixes.Read),
                 ReadOrThrowClassName = name.WithSuffix(Suffixes.ReadOrThrow),
                 ReadManyClassName = name.WithSuffix(Suffixes.ReadMany),
@@ -118,6 +119,7 @@ static class PartitionPlanBuilder
                 QueryUnionsClassName = name.WithSuffix(Suffixes.QueryUnions),
                 ReadOrCreateClassName = name.WithSuffix(Suffixes.ReadOrCreate),
                 CreateClassName = name.WithSuffix(Suffixes.Create),
+                CreateWithoutResultClassName = name.WithSuffix(Suffixes.CreateWithoutResult),
                 BatchClassName = name.WithSuffix(Suffixes.Batch),
                 GetPkModel = methodModel
             };
