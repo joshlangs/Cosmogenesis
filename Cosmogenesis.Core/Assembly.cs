@@ -2,4 +2,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Cosmogenesis.Core.Tests")] 
+[assembly: InternalsVisibleTo("Test.Cosmogenesis.Core")] 
